@@ -34,3 +34,6 @@ __pycache__/
 *.pyc
 .env
 venv/
+
+# Environment Variables
+id.env
