@@ -44,6 +44,7 @@ const TopTracksArtists = () => {
   useEffect(() => {
     if (topGenres.length > 0) {
       drawGenresChart(topGenres);
+      drawThreeJsBarChart(topGenres);
     }
   }, [topGenres]);
 
@@ -62,7 +63,14 @@ const TopTracksArtists = () => {
 
     svg.selectAll("*").remove(); // Clear the chart before drawing
 
-    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const maxGenreLength = Math.max(...genres.map((d) => d.genre.length));
+    const margin = {
+      top: 20,
+      right: 30,
+      bottom: 20 + maxGenreLength * 5, // Adjust bottom margin based on text length
+      left: 50,
+    };
+
     const width = 800 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
@@ -132,6 +140,35 @@ const TopTracksArtists = () => {
     animate();
   };
 
+  const drawThreeJsBarChart = (genres) => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 800 / 500, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(800, 500);
+    document
+      .getElementById("three-genres-chart")
+      .appendChild(renderer.domElement);
+
+    genres.forEach((genre, index) => {
+      const geometry = new THREE.BoxGeometry(1, genre.count, 1);
+      const material = new THREE.MeshBasicMaterial({
+        color: Math.random() * 0xffffff,
+      });
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(index - genres.length / 2, genre.count / 2, 0);
+      scene.add(cube);
+    });
+
+    camera.position.z = 20;
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  };
+
   const generateRandomGenre = () => {
     if (leastGenres.length > 0) {
       const randomGenre =
@@ -161,12 +198,17 @@ const TopTracksArtists = () => {
             Most Played Genres (D3.js)
           </Heading>
           <svg id="d3-genres-chart"></svg>
+          <div id="three-genres-chart"></div>
         </Box>
         <Box className="chart-container">
           <Heading as="h3" size="md" mt={4} textAlign={"center"}>
             Generate a random genre you have listened to!
           </Heading>
-          <Button onClick={generateRandomGenre} className="button">
+          <Button
+            onClick={generateRandomGenre}
+            className="button"
+            colorScheme="green"
+          >
             Generate Random Genre
           </Button>
           {randomLeastGenre && <p>{randomLeastGenre}</p>}
