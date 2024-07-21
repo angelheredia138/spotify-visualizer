@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SpotifyLogin from "./components/SpotifyLogin";
 import Callback from "./components/Callback";
+import MainPage from "./components/MainPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<SpotifyLogin />} />
           <Route path="/callback" element={<Callback />} />
+          <Route path="/main" element={<MainPage />} />
         </Routes>
       </Router>
     </ChakraProvider>

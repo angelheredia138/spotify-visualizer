@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import spotify_login, callback
+from .views import spotify_callback
 
 urlpatterns = [
-    path('login/', spotify_login, name='spotify-login'),
-    path('callback/', callback, name='spotify-callback'),
+    path('spotify-callback/', spotify_callback, name='spotify-callback'),  # Correct path
 ]
