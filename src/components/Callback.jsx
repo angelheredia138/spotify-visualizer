@@ -1,16 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Flex, Spinner, Text, VStack } from "@chakra-ui/react";
 import "../assets/css/Callback.css";
 
 const Callback = () => {
   const navigate = useNavigate();
+  const processing = React.useRef(false); // Use a ref to prevent re-processing
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
 
-    if (code) {
+    if (code && !processing.current) {
+      processing.current = true; // Set the ref to true to indicate processing has started
+
       fetch(`http://localhost:8000/api/spotify-callback/?code=${code}`)
         .then((response) => response.json())
         .then((data) => {
@@ -28,9 +31,6 @@ const Callback = () => {
           console.error("Error during token exchange:", error);
           navigate("/");
         });
-    } else {
-      console.error("No authorization code found.");
-      navigate("/");
     }
   }, [navigate]);
 

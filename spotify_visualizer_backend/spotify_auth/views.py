@@ -27,8 +27,6 @@ def spotify_callback(request):
     if not code:
         return JsonResponse({'error': 'Authorization code not provided'}, status=400)
 
-    logger.debug(f"Received authorization code: {code}")
-
     token_url = "https://accounts.spotify.com/api/token"
     response = requests.post(token_url, data={
         'grant_type': 'authorization_code',
@@ -49,5 +47,4 @@ def spotify_callback(request):
     with open('refresh_token.txt', 'w') as f:
         f.write(refresh_token)
 
-    logger.debug(f"Received tokens: {tokens}")
     return JsonResponse({'access_token': access_token, 'refresh_token': refresh_token})

@@ -16,8 +16,6 @@ def get_spotify_access_token():
     client_secret = settings.SPOTIFY_CLIENT_SECRET
 
     # Log the client_id and client_secret for debugging purposes
-    logger.debug(f"Client ID: {client_id}")
-    logger.debug(f"Client Secret: {client_secret}")
 
     url = 'https://accounts.spotify.com/api/token'
     headers = {
