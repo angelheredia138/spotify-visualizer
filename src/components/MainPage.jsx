@@ -9,6 +9,7 @@ const MainPage = () => {
   const handleLogout = () => {
     localStorage.removeItem("spotifyAccessToken");
     localStorage.removeItem("spotifyRefreshToken");
+    sessionStorage.removeItem("spotifyCallbackHandled");
     navigate("/");
   };
 
@@ -17,31 +18,37 @@ const MainPage = () => {
       title: "Top Tracks and Artists",
       description:
         "View your most played tracks and artists over time with bar charts or bubble charts.",
+      path: "/top-tracks-artists",
     },
     {
       title: "Audio Features",
       description:
         "Visualize attributes like danceability, energy, tempo, and valence of your top tracks with radar charts or scatter plots.",
+      path: "#",
     },
     {
       title: "Listening History",
       description:
         "See your recently played tracks displayed on a timeline or heatmap, showing your listening patterns.",
+      path: "#",
     },
     {
       title: "Genres",
       description:
         "Understand the distribution of genres you listen to with pie charts or word clouds.",
+      path: "#",
     },
     {
       title: "Playlists",
       description:
         "Explore your created and followed playlists using network graphs showing relationships between playlists, tracks, and artists.",
+      path: "#",
     },
     {
       title: "Top Genres",
       description:
         "Visualize the aggregated genres of your top artists with sunburst charts or hierarchical treemaps.",
+      path: "#",
     },
   ];
 
@@ -66,7 +73,7 @@ const MainPage = () => {
         width="80%"
       >
         <Text fontSize="2xl" fontWeight="bold">
-          Welcome to Spotify Visualizer!
+          Welcome to Spotify Visualizer
         </Text>
         <Text>
           Your Spotify data will be displayed here through various
@@ -85,7 +92,11 @@ const MainPage = () => {
               {vis.title}
             </Text>
             <Text>{vis.description}</Text>
-            <Button colorScheme="blue" mt={2}>
+            <Button
+              colorScheme="blue"
+              mt={2}
+              onClick={() => navigate(vis.path)}
+            >
               View {vis.title}
             </Button>
           </Box>

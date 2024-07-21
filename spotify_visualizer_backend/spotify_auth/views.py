@@ -1,40 +1,53 @@
-from django.shortcuts import redirect
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .utils import update_or_create_user_tokens
-from django.contrib.auth.models import User
+import os
 import requests
-import json
 from django.conf import settings
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.http import JsonResponse
+import logging
+from django.views.decorators.csrf import csrf_exempt
 
-SPOTIFY_CLIENT_ID = settings.SPOTIFY_CLIENT_ID
-SPOTIFY_CLIENT_SECRET = settings.SPOTIFY_CLIENT_SECRET
-REDIRECT_URI = 'http://localhost:5173/callback'  # Change this to your frontend callback URL
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-def spotify_login(request):
-    scopes = 'user-read-recently-played user-top-read'
-    url = 'https://accounts.spotify.com/authorize'
-    params = {
-        'client_id': SPOTIFY_CLIENT_ID,
-        'response_type': 'code',
-        'redirect_uri': REDIRECT_URI,
-        'scope': scopes,
-    }
-    response = requests.get(url, params=params)
-    return redirect(response.url)
+@api_view(['GET'])
+def spotify_auth(request):
+    auth_url = (
+        f"https://accounts.spotify.com/authorize"
+        f"?client_id={settings.SPOTIFY_CLIENT_ID}"
+        f"&response_type=code"
+        f"&redirect_uri={settings.SPOTIFY_REDIRECT_URI}"
+        f"&scope=user-modify-playback-state user-read-recently-played user-top-read"
+    )
+    return Response({'auth_url': auth_url})
 
-@csrf_exempt
+@api_view(['GET'])
 def spotify_callback(request):
-    code = request.POST.get('code')
-    redirect_uri = 'http://localhost:3000/callback'
+    code = request.GET.get('code')
+    if not code:
+        return JsonResponse({'error': 'Authorization code not provided'}, status=400)
 
-    payload = {
+    logger.debug(f"Received authorization code: {code}")
+
+    token_url = "https://accounts.spotify.com/api/token"
+    response = requests.post(token_url, data={
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': redirect_uri,
+        'redirect_uri': settings.SPOTIFY_REDIRECT_URI,
         'client_id': settings.SPOTIFY_CLIENT_ID,
         'client_secret': settings.SPOTIFY_CLIENT_SECRET,
-    }
+    })
+    if response.status_code != 200:
+        logger.error(f"Error during token exchange: {response.content}")
+        return JsonResponse({'error': 'Token exchange failed'}, status=400)
 
-    response = requests.post('https://accounts.spotify.com/api/token', data=payload)
-    return JsonResponse(response.json())
+    tokens = response.json()
+    access_token = tokens.get('access_token')
+    refresh_token = tokens.get('refresh_token')
+
+    # Store the refresh token securely
+    with open('refresh_token.txt', 'w') as f:
+        f.write(refresh_token)
+
+    logger.debug(f"Received tokens: {tokens}")
+    return JsonResponse({'access_token': access_token, 'refresh_token': refresh_token})

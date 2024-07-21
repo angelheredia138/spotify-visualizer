@@ -35,5 +35,5 @@ __pycache__/
 .env
 venv/
 
-# Environment Variables
-id.env
+# Refresh token
+refresh_token.txt

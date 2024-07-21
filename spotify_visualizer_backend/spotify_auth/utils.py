@@ -1,23 +1,54 @@
-from .models import SpotifyToken
-from django.utils import timezone
-from datetime import timedelta
+import requests
+import os
+from dotenv import load_dotenv
+import logging
+from django.conf import settings
 
-def get_user_tokens(user):
-    user_tokens = SpotifyToken.objects.filter(user=user)
-    if user_tokens.exists():
-        return user_tokens[0]
-    return None
 
-def update_or_create_user_tokens(user, access_token, refresh_token, expires_in, token_type):
-    tokens = get_user_tokens(user)
-    expires_in = timezone.now() + timedelta(seconds=expires_in)
+load_dotenv()
+logger = logging.getLogger(__name__)
 
-    if tokens:
-        tokens.access_token = access_token
-        tokens.refresh_token = refresh_token
-        tokens.expires_in = expires_in
-        tokens.token_type = token_type
-        tokens.save(update_fields=['access_token', 'refresh_token', 'expires_in', 'token_type'])
-    else:
-        tokens = SpotifyToken(user=user, access_token=access_token, refresh_token=refresh_token, expires_in=expires_in, token_type=token_type)
-        tokens.save()
+def get_spotify_access_token():
+    with open('refresh_token.txt', 'r') as file:
+        refresh_token = file.read()
+
+    client_id = settings.SPOTIFY_CLIENT_ID
+    client_secret = settings.SPOTIFY_CLIENT_SECRET
+
+    # Log the client_id and client_secret for debugging purposes
+    logger.debug(f"Client ID: {client_id}")
+    logger.debug(f"Client Secret: {client_secret}")
+
+    url = 'https://accounts.spotify.com/api/token'
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token,
+        'client_id': client_id,
+        'client_secret': client_secret
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    response_data = response.json()
+
+    if response.status_code != 200 or 'access_token' not in response_data:
+        logger.error(f"Error refreshing token: {response.status_code} {response.text}")
+        raise Exception('Could not refresh Spotify access token')
+
+    if 'refresh_token' in response_data:
+        with open('refresh_token.txt', 'w') as file:
+            file.write(response_data['refresh_token'])
+
+    return response_data['access_token']
+
+def spotify_api_request(method, url, headers=None, params=None, data=None):
+    response = requests.request(
+        method=method,
+        url=url,
+        headers=headers,
+        params=params,
+        data=data
+    )
+    return response
