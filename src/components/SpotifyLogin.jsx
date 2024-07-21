@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Button, Flex, Heading, Text, VStack } from "@chakra-ui/react";
+import "../assets/css/SpotifyLogin.css";
 
 const SpotifyLogin = () => {
   const handleLogin = () => {
@@ -13,12 +14,22 @@ const SpotifyLogin = () => {
 
   return (
     <Flex
-      height="100vh"
+      className="animated-background"
+      minHeight="100vh"
+      width="100vw"
       alignItems="center"
       justifyContent="center"
-      bg="gray.800"
+      color="white"
     >
-      <VStack spacing={4} p={6} boxShadow="lg" bg="white" rounded="md">
+      <VStack
+        spacing={6}
+        p={6}
+        boxShadow="lg"
+        bg="white"
+        rounded="md"
+        color="black"
+        textAlign="center"
+      >
         <Heading size="lg" color="green.500">
           Spotify Visualizer
         </Heading>
