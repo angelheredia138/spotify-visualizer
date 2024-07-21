@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 import logging
 from django.views.decorators.csrf import csrf_exempt
+from .utils import get_spotify_access_token
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -48,3 +49,68 @@ def spotify_callback(request):
         f.write(refresh_token)
 
     return JsonResponse({'access_token': access_token, 'refresh_token': refresh_token})
+
+@api_view(['GET'])
+def top_tracks(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    time_range = request.GET.get('time_range', 'medium_term')
+    url = f"https://api.spotify.com/v1/me/top/tracks?time_range={time_range}&limit=10"
+
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch top tracks'}, status=response.status_code)
+
+    return JsonResponse(response.json())
+
+@api_view(['GET'])
+def top_artists(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    time_range = request.GET.get('time_range', 'medium_term')
+    url = f"https://api.spotify.com/v1/me/top/artists?time_range={time_range}&limit=10"
+
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch top artists'}, status=response.status_code)
+
+    return JsonResponse(response.json())
+
+@api_view(['GET'])
+def top_genres(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    time_range = request.GET.get('time_range', 'medium_term')  # default to medium_term
+    url = f"https://api.spotify.com/v1/me/top/artists?time_range={time_range}&limit=50"
+
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch top genres'}, status=response.status_code)
+
+    artists = response.json().get('items', [])
+    genres = {}
+    for artist in artists:
+        for genre in artist.get('genres', []):
+            if genre in genres:
+                genres[genre] += 1
+            else:
+                genres[genre] = 1
+
+    genres_list = [{'genre': genre, 'count': count} for genre, count in genres.items()]
+    sorted_genres = sorted(genres_list, key=lambda x: x['count'], reverse=True)
+    
+    # Get top 10 genres
+    top_genres = sorted_genres[:10]
+    # Get least listened-to genres
+    least_genres = sorted_genres[10:]
+
+    return JsonResponse({'top_genres': top_genres, 'least_genres': least_genres})

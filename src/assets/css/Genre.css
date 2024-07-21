@@ -1,21 +1,15 @@
 html,
 body {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
-
 .animated-background {
   width: 100vw;
-  height: 100vh;
   background: linear-gradient(270deg, #4299e1, #48bb78, #4299e1);
   background-size: 600% 600%;
   animation: gradientAnimation 10s ease infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 @keyframes gradientAnimation {
@@ -31,24 +25,15 @@ body {
 }
 
 .container {
-  width: 80%;
-  height: 90%;
   padding: 20px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  overflow-y: auto;
+  max-width: 900px;
 }
 
 .heading {
   text-align: center;
   margin-bottom: 20px;
-  color: #2d3748;
+  color: #fff;
 }
 
 .chart-container {
@@ -57,8 +42,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-  width: 100%;
-  text-align: center;
+  align-items: center;
 }
 
 .button {
@@ -78,8 +62,6 @@ body {
 
 svg {
   font: 10px sans-serif;
-  width: 100%;
-  height: 500px;
 }
 
 .axis path,

@@ -5,7 +5,6 @@ import SpotifyLogin from "./components/SpotifyLogin";
 import Callback from "./components/Callback";
 import MainPage from "./components/MainPage";
 import TopTracksArtists from "./components/TopTracksArtists";
-
 function App() {
   return (
     <ChakraProvider>
