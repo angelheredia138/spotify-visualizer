@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
 html,
 body {
   width: 100vw;
@@ -6,6 +7,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .animated-background {
   width: 100vw;
   min-height: 100vh;
@@ -78,20 +80,24 @@ svg {
   font-family: "Poppins", sans-serif;
   font-size: 12px;
 }
+
 #d3-genres-chart {
   background-color: transparent;
 }
+
 .tooltip {
   font-family: "Poppins", sans-serif;
   font-size: 12px;
   pointer-events: none;
 }
+
 .time-range-controls {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
 }
+
 .chart-container .bar text {
   font-weight: bold;
 }
@@ -108,6 +114,7 @@ svg {
 .dropdown {
   font-weight: bold;
 }
+
 .artist-leaderboard ul {
   list-style-type: none;
   padding: 0;
@@ -117,4 +124,28 @@ svg {
   margin-bottom: 10px;
   font-size: 14px;
   line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  #d3-genres-chart,
+  #d3-leaderboard {
+    width: 100% !important;
+  }
+
+  .time-range-controls {
+    width: 100%;
+  }
+}
+
+/* Add rules to handle large screens */
+@media (min-width: 769px) {
+  .chart-container {
+    flex: 1;
+    margin: 10px;
+  }
 }

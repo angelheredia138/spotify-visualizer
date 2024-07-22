@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, VStack, Box, Text, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Heading,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import "../assets/css/MainPage.css";
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(null);
 
   const handleLogout = () => {
     localStorage.removeItem("spotifyAccessToken");
@@ -13,12 +22,20 @@ const MainPage = () => {
     navigate("/");
   };
 
+  const handleExpand = (index) => {
+    setExpanded(expanded === index ? null : index);
+  };
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
   const visualizations = [
     {
-      title: "Top Tracks and Artists",
+      title: "Top Genres and Artists",
       description:
-        "View your most played tracks and artists over time with bar charts or bubble charts.",
-      path: "/top-tracks-artists",
+        "Discover your most played genres and artists with interactive charts and detailed insights.",
+      path: "/top-genres-artists",
     },
     {
       title: "Audio Features",
@@ -62,45 +79,51 @@ const MainPage = () => {
       color="white"
       p={6}
     >
-      <VStack
-        spacing={6}
-        p={6}
-        boxShadow="lg"
-        bg="white"
-        rounded="md"
-        color="black"
-        textAlign="center"
-        width="80%"
-      >
-        <Text fontSize="2xl" fontWeight="bold">
+      <VStack spacing={6} width="100%">
+        <Heading fontSize="2xl" fontWeight="bold">
           Welcome to Spotify Visualizer
-        </Text>
-        <Text>
-          Your Spotify data will be displayed here through various
-          visualizations.
-        </Text>
-        {visualizations.map((vis, index) => (
-          <Box
-            key={index}
-            p={4}
-            borderWidth={1}
-            borderRadius="md"
-            w="100%"
-            textAlign="left"
-          >
-            <Text fontSize="lg" fontWeight="bold">
-              {vis.title}
-            </Text>
-            <Text>{vis.description}</Text>
-            <Button
-              colorScheme="blue"
-              mt={2}
-              onClick={() => navigate(vis.path)}
+        </Heading>
+
+        <Grid
+          templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }}
+          gap={6}
+          width="100%"
+          className={expanded !== null ? "blur-background" : ""}
+        >
+          {visualizations.map((vis, index) => (
+            <Box
+              key={index}
+              p={4}
+              borderWidth={1}
+              borderRadius="md"
+              bg="white"
+              color="black"
+              textAlign="center"
+              boxShadow="lg"
+              onClick={() => handleExpand(index)}
+              cursor="pointer"
+              className="grid-item"
             >
-              View {vis.title}
+              <Heading fontSize="lg">{vis.title}</Heading>
+            </Box>
+          ))}
+        </Grid>
+        {expanded !== null && (
+          <Box className="expanded-box">
+            <Heading fontSize="lg">{visualizations[expanded].title}</Heading>
+            <Text mt={4}>{visualizations[expanded].description}</Text>
+            <Button
+              mt={4}
+              colorScheme="blue"
+              onClick={() => handleNavigate(visualizations[expanded].path)}
+            >
+              View {visualizations[expanded].title}
+            </Button>
+            <Button mt={4} colorScheme="red" onClick={() => setExpanded(null)}>
+              Close
             </Button>
           </Box>
-        ))}
+        )}
         <Button colorScheme="red" onClick={handleLogout}>
           Logout
         </Button>

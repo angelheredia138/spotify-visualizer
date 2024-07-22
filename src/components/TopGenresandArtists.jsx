@@ -16,13 +16,14 @@ import {
 } from "@chakra-ui/react";
 import "../assets/css/Genre.css"; // Make sure to import the CSS
 
-const TopTracksArtists = () => {
+const TopGenresandArtists = () => {
   const [topGenres, setTopGenres] = useState([]);
   const [leastGenres, setLeastGenres] = useState([]);
   const [randomLeastGenre, setRandomLeastGenre] = useState(null);
   const [artists, setArtists] = useState([]);
   const [timeRange, setTimeRange] = useState("medium_term"); // Default to medium_term
   const [loading, setLoading] = useState(true); // Add loading state
+  const columns = useBreakpointValue({ base: 1, md: 2 });
 
   const fetchData = async () => {
     try {
@@ -377,15 +378,10 @@ const TopTracksArtists = () => {
 
   return (
     <div className="animated-background">
-      <Heading as="h2" size="lg" mb={4} className="heading">
+      <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Most Played Genres
       </Heading>
-      <SimpleGrid
-        columns={{ base: 1, md: 2 }}
-        spacing={10}
-        width="100%"
-        padding={4}
-      >
+      <SimpleGrid columns={columns} spacing={10} width="100%" padding={4}>
         <Box className="chart-container">
           <Heading as="h3" size="md" mb={4}>
             Most Played Genres (D3.js)
@@ -408,7 +404,7 @@ const TopTracksArtists = () => {
             All Time Artist Leaderboard
           </Heading>
           <svg id="d3-leaderboard" style={{ marginBottom: "40px" }}></svg>
-          <Box className="">
+          <Box>
             <Heading as="h3" size="md" mt={4} textAlign={"center"}>
               Generate a random genre you have listened to!
             </Heading>
@@ -437,4 +433,4 @@ const TopTracksArtists = () => {
   );
 };
 
-export default TopTracksArtists;
+export default TopGenresandArtists;
