@@ -101,16 +101,13 @@ def top_genres(request):
     for artist in artists:
         for genre in artist.get('genres', []):
             if genre in genres:
-                genres[genre] += 1
+                genres[genre]['count'] += 1
+                genres[genre]['artists'].append(artist['name'])
             else:
-                genres[genre] = 1
+                genres[genre] = {'count': 1, 'artists': [artist['name']]}
 
-    genres_list = [{'genre': genre, 'count': count} for genre, count in genres.items()]
-    sorted_genres = sorted(genres_list, key=lambda x: x['count'], reverse=True)
-    
-    # Get top 10 genres
-    top_genres = sorted_genres[:10]
-    # Get least listened-to genres
-    least_genres = sorted_genres[10:]
+    genres_list = [{'genre': genre, 'count': data['count'], 'artists': data['artists']} for genre, data in genres.items()]
+    top_genres = sorted(genres_list, key=lambda x: x['count'], reverse=True)[:10]
+    least_genres = [genre for genre in genres_list if genre not in top_genres]
 
     return JsonResponse({'top_genres': top_genres, 'least_genres': least_genres})

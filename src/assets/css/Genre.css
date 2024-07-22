@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 html,
 body {
   width: 100vw;
@@ -7,6 +8,7 @@ body {
 }
 .animated-background {
   width: 100vw;
+  min-height: 100vh;
   background: linear-gradient(270deg, #4299e1, #48bb78, #4299e1);
   background-size: 600% 600%;
   animation: gradientAnimation 10s ease infinite;
@@ -24,15 +26,6 @@ body {
   }
 }
 
-.container {
-  padding: 20px;
-  margin: 0 auto;
-  max-width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .heading {
   text-align: center;
   margin-bottom: 20px;
@@ -43,8 +36,8 @@ body {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  justify-items: center;
   align-items: center;
   text-align: center;
 }
@@ -63,12 +56,13 @@ body {
 }
 
 svg {
-  font: 5px sans-serif;
+  font: 20px sans-serif;
 }
 
 .axis path,
 .axis line {
   fill: none;
+  stroke: #000;
   shape-rendering: crispEdges;
 }
 
@@ -78,4 +72,49 @@ svg {
 
 .bar:hover {
   fill: orange;
+}
+
+.axis text {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+}
+#d3-genres-chart {
+  background-color: transparent;
+}
+.tooltip {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  pointer-events: none;
+}
+.time-range-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.chart-container .bar text {
+  font-weight: bold;
+}
+
+.time-range-controls select {
+  font-weight: bold;
+  color: black;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.dropdown {
+  font-weight: bold;
+}
+.artist-leaderboard ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.artist-leaderboard li {
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.4;
 }
