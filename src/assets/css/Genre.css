@@ -43,7 +43,35 @@ body {
   align-items: center;
   text-align: center;
 }
+.chart-container-transparent {
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+}
 
+.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  z-index: 1000;
+  padding: 10px;
+  overflow: auto;
+}
+
+.fullscreen .heading {
+  margin-bottom: 20px;
+}
+
+.fullscreen svg {
+  width: 100% !important;
+  height: 80vh !important;
+}
 .button {
   display: block;
   margin: 10px auto;
@@ -59,6 +87,7 @@ body {
 
 svg {
   font: 20px sans-serif;
+  background-color: transparent !important; /* Ensure all SVGs are transparent */
 }
 
 .axis path,
@@ -81,10 +110,6 @@ svg {
   font-size: 12px;
 }
 
-#d3-genres-chart {
-  background-color: transparent;
-}
-
 .tooltip {
   font-family: "Poppins", sans-serif;
   font-size: 12px;
@@ -98,10 +123,6 @@ svg {
   margin-top: 20px;
 }
 
-.chart-container .bar text {
-  font-weight: bold;
-}
-
 .time-range-controls select {
   font-weight: bold;
   color: black;
@@ -113,17 +134,6 @@ svg {
 
 .dropdown {
   font-weight: bold;
-}
-
-.artist-leaderboard ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.artist-leaderboard li {
-  margin-bottom: 10px;
-  font-size: 14px;
-  line-height: 1.4;
 }
 
 @media (max-width: 768px) {
@@ -142,7 +152,6 @@ svg {
   }
 }
 
-/* Add rules to handle large screens */
 @media (min-width: 769px) {
   .chart-container {
     flex: 1;
