@@ -57,7 +57,7 @@ def top_tracks(request):
         return JsonResponse({'error': 'Token not available'}, status=400)
 
     time_range = request.GET.get('time_range', 'medium_term')
-    url = f"https://api.spotify.com/v1/me/top/tracks?time_range={time_range}&limit=10"
+    url = f"https://api.spotify.com/v1/me/top/tracks?time_range={time_range}&limit=40"
 
     headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(url, headers=headers)
@@ -65,6 +65,7 @@ def top_tracks(request):
         return JsonResponse({'error': 'Failed to fetch top tracks'}, status=response.status_code)
 
     return JsonResponse(response.json())
+
 
 @api_view(['GET'])
 def top_artists(request):

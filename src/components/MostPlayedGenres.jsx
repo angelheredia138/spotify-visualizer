@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import * as d3 from "d3";
 import { Select, Box } from "@chakra-ui/react";
-import "../assets/css/Genre.css";
+import "../assets/css/Components.css";
 
 const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
   useEffect(() => {

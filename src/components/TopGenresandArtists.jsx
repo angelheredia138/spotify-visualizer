@@ -14,7 +14,7 @@ import {
   SimpleGrid,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import "../assets/css/Genre.css";
+import "../assets/css/Components.css";
 
 const TopGenresandArtists = () => {
   const [topGenres, setTopGenres] = useState([]);

@@ -18,7 +18,6 @@ const Callback = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.access_token) {
-            console.log("Received tokens:", data);
             localStorage.setItem("spotify_access_token", data.access_token);
             localStorage.setItem("spotify_refresh_token", data.refresh_token);
             navigate("/main");

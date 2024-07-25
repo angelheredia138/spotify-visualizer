@@ -41,7 +41,7 @@ const MainPage = () => {
       title: "Audio Features",
       description:
         "Visualize attributes like danceability, energy, tempo, and valence of your top tracks with radar charts or scatter plots.",
-      path: "#",
+      path: "/audio-features",
     },
     {
       title: "Listening History",

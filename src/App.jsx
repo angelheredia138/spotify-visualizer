@@ -5,6 +5,7 @@ import SpotifyLogin from "./components/SpotifyLogin";
 import Callback from "./components/Callback";
 import MainPage from "./components/MainPage";
 import TopGenresAndArtists from "./components/TopGenresandArtists";
+import AudioFeatures from "./components/AudioFeatures";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/callback" element={<Callback />} />
           <Route path="/main" element={<MainPage />} />
           <Route path="/top-genres-artists" element={<TopGenresAndArtists />} />
+          <Route path="/audio-features" element={<AudioFeatures />} />
         </Routes>
       </Router>
     </ChakraProvider>
