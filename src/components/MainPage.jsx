@@ -53,19 +53,18 @@ const MainPage = () => {
       title: "Genres",
       description:
         "Understand the distribution of genres you listen to with pie charts or word clouds.",
-      path: "#",
+      path: "/genres",
     },
     {
       title: "Playlists",
       description:
         "Explore your created and followed playlists using network graphs showing relationships between playlists, tracks, and artists.",
-      path: "#",
+      path: "/playlists",
     },
     {
-      title: "Top Genres",
-      description:
-        "Visualize the aggregated genres of your top artists with sunburst charts or hierarchical treemaps.",
-      path: "#",
+      title: "Classic Spotify Wrapped",
+      description: "tbd",
+      path: "/wrapped",
     },
   ];
 

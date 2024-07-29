@@ -7,6 +7,9 @@ import MainPage from "./components/MainPage";
 import TopGenresAndArtists from "./components/parents/TopGenresandArtists";
 import AudioFeatures from "./components/parents/AudioFeatures";
 import ListeningHistory from "./components/parents/ListeningHistory";
+import Genres from "./components/parents/Genres";
+import Playlists from "./components/parents/Playlists";
+import Wrapped from "./components/parents/Wrapped";
 
 function App() {
   return (
@@ -19,6 +22,9 @@ function App() {
           <Route path="/top-genres-artists" element={<TopGenresAndArtists />} />
           <Route path="/audio-features" element={<AudioFeatures />} />
           <Route path="/listening-history" element={<ListeningHistory />} />
+          <Route path="/genres" element={<Genres />} />
+          <Route path="/playlists" element={<Playlists />} />
+          <Route path="/wrapped" element={<Wrapped />} />
         </Routes>
       </Router>
     </ChakraProvider>
