@@ -9,7 +9,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import "../assets/css/MainPage.css";
+import "./css/MainPage.css";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const MainPage = () => {
       title: "Listening History",
       description:
         "See your recently played tracks displayed on a timeline or heatmap, showing your listening patterns.",
-      path: "#",
+      path: "/listening-history",
     },
     {
       title: "Genres",

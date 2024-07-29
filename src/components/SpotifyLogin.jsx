@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Flex, Heading, Text, VStack } from "@chakra-ui/react";
-import "../assets/css/SpotifyLogin.css";
+import "./css/SpotifyLogin.css";
 
 const SpotifyLogin = () => {
   const handleLogin = () => {

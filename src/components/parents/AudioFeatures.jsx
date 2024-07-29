@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ScatterPlot from "./ScatterPlot";
-import RadarChart from "./RadarChart";
+import ScatterPlot from "../children/ScatterPlot";
+import RadarChart from "../children/RadarChart";
 import {
   Select,
   Box,
@@ -14,7 +14,7 @@ import {
   SimpleGrid,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import "../assets/css/Components.css";
+import "../css/Components.css";
 
 const AudioFeatures = () => {
   const [tracks, setTracks] = useState([]);

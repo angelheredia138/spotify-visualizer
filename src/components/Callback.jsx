@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Flex, Spinner, Text, VStack } from "@chakra-ui/react";
-import "../assets/css/Callback.css";
+import "./css/Callback.css";
 
 const Callback = () => {
   const navigate = useNavigate();

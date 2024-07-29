@@ -4,8 +4,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SpotifyLogin from "./components/SpotifyLogin";
 import Callback from "./components/Callback";
 import MainPage from "./components/MainPage";
-import TopGenresAndArtists from "./components/TopGenresandArtists";
-import AudioFeatures from "./components/AudioFeatures";
+import TopGenresAndArtists from "./components/parents/TopGenresandArtists";
+import AudioFeatures from "./components/parents/AudioFeatures";
+import ListeningHistory from "./components/parents/ListeningHistory";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/main" element={<MainPage />} />
           <Route path="/top-genres-artists" element={<TopGenresAndArtists />} />
           <Route path="/audio-features" element={<AudioFeatures />} />
+          <Route path="/listening-history" element={<ListeningHistory />} />
         </Routes>
       </Router>
     </ChakraProvider>

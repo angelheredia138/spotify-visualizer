@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 import { Box, Select } from "@chakra-ui/react";
-import "../assets/css/Components.css";
+import "../css/Components.css";
 
 const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
   const [processedTracks, setProcessedTracks] = useState([]);
