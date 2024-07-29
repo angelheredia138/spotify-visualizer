@@ -5,6 +5,7 @@ import "../assets/css/Components.css";
 
 const ArtistLeaderboard = ({ artists }) => {
   const [processedArtists, setProcessedArtists] = useState([]);
+  let hoverTimeout = null;
 
   useEffect(() => {
     if (artists.length > 0) {
@@ -130,6 +131,9 @@ const ArtistLeaderboard = ({ artists }) => {
         tooltip
           .style("top", event.pageY - 10 + "px")
           .style("left", event.pageX + 10 + "px");
+        hoverTimeout = setTimeout(() => {
+          tooltip.style("display", "none");
+        }, 15000); // Hide the tooltip after 1 second
       })
       .on("mouseout", function () {
         isHovering = false;

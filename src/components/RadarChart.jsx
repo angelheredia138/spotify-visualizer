@@ -7,6 +7,7 @@ const RadarChart = ({ tracks }) => {
   const [processedTracks, setProcessedTracks] = useState([]);
   const [selectedTrack, setSelectedTrack] = useState(null);
   let isHovering = false;
+  let hoverTimeout = null;
   let clickTimeout = null;
 
   useEffect(() => {
@@ -158,19 +159,30 @@ const RadarChart = ({ tracks }) => {
     axis
       .append("text")
       .attr("class", "legend")
-      .style("font-size", "12px")
+      .style("font-size", "30px")
       .style("font-family", "'Poppins', sans-serif")
       .style("font-weight", "bold")
       .attr("text-anchor", "middle")
       .attr("dy", "0.35em")
       .attr(
         "x",
-        (d, i) => (radius + 10) * Math.cos(angleSlice * i - Math.PI / 2)
+        (d, i) => (radius + 30) * Math.cos(angleSlice * i - Math.PI / 2)
       )
       .attr(
         "y",
-        (d, i) => (radius + 10) * Math.sin(angleSlice * i - Math.PI / 2)
+        (d, i) => (radius + 30) * Math.sin(angleSlice * i - Math.PI / 2)
       )
+      .attr("transform", (d, i) => {
+        const x = (radius + 30) * Math.cos(angleSlice * i - Math.PI / 2);
+        const y = (radius + 30) * Math.sin(angleSlice * i - Math.PI / 2);
+        if (d === "valence") {
+          return `rotate(-90 ${x} ${y})`;
+        } else if (d === "energy") {
+          return `rotate(90 ${x} ${y})`;
+        } else {
+          return `rotate(0 ${x} ${y})`;
+        }
+      })
       .text((d) => d);
 
     // Prepare data
@@ -224,40 +236,40 @@ const RadarChart = ({ tracks }) => {
           d3.select(this).style("fill-opacity", 0.3);
         })
         .on("mousemove", function (event) {
+          clearTimeout(hoverTimeout); // Clear any existing timeout
           tooltip
             .style("top", event.pageY - 10 + "px")
             .style("left", event.pageX + 10 + "px");
+
+          hoverTimeout = setTimeout(() => {
+            tooltip.style("display", "none");
+          }, 15000); // Hide the tooltip after 1 second
         })
         .on("mouseout", function () {
           isHovering = false;
+          clearTimeout(hoverTimeout); // Clear the hover timeout
           tooltip.style("display", "none");
           if (!selectedTrack || selectedTrack.name !== data.name) {
             d3.select(this).style("fill-opacity", 0.1);
           }
         })
-        .on("click", function () {
+        .on("click", function (event, d) {
           if (isHovering) return;
 
-          if (selectedTrack && selectedTrack.name === data.name) {
-            setSelectedTrack(null);
-            d3.select(this).style("fill-opacity", 0.1);
-            tooltip.style("display", "none");
-          } else {
-            setSelectedTrack(data);
-            tooltip.style("display", "block").html(
-              `<strong>${data.name} - ${data.artist}</strong><br/>
+          tooltip.style("display", "block").html(
+            `<strong>${data.name} - ${data.artist}</strong><br/>
                  Danceability: ${data.axes[0].value.toFixed(2)}<br/>
                  Energy: ${data.axes[1].value.toFixed(2)}<br/>
                  Tempo: ${(data.axes[2].value * maxValue).toFixed(2)}<br/>
                  Valence: ${data.axes[3].value.toFixed(2)}`
-            );
-            d3.select(this).style("fill-opacity", 0.3);
+          );
+          d3.select(this).style("fill-opacity", 0.3); // Apply fill opacity change here
 
-            clearTimeout(clickTimeout); // Clear any existing timeout
-            clickTimeout = setTimeout(() => {
-              tooltip.style("display", "none");
-            }, 1000); // Hide the tooltip after 1 second
-          }
+          clearTimeout(clickTimeout); // Clear any existing timeout
+          clickTimeout = setTimeout(() => {
+            tooltip.style("display", "none");
+            d3.select(this).style("fill-opacity", 0.1);
+          }, 1000); // Hide the tooltip after 1 second
         });
 
       blobWrapper
@@ -291,10 +303,10 @@ const RadarChart = ({ tracks }) => {
       .enter()
       .append("g")
       .attr("class", "legend-item")
-      .attr("transform", (d, i) => `translate(0, ${i * 20})`)
+      .attr("transform", (d, i) => `translate(0, ${i * 50})`)
       .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
+      .attr("x", -600)
+      .attr("y", 520)
       .attr("width", 10)
       .attr("height", 10)
       .style("fill", (d, i) => d3.schemeCategory10[i % 10]);
@@ -302,11 +314,22 @@ const RadarChart = ({ tracks }) => {
     legend
       .selectAll(".legend-item")
       .append("text")
-      .attr("x", 20)
-      .attr("y", 10)
-      .style("font-size", "12px")
+      .attr("x", -580)
+      .attr("y", 530)
+      .style("font-size", "20px")
+      .style("font-weight", "bold")
       .style("font-family", "'Poppins', sans-serif")
-      .text((d) => `${d.name} - ${d.artist}`);
+      .text((d) => `${d.name}`);
+
+    legend
+      .selectAll(".legend-item")
+      .append("text")
+      .attr("x", -580)
+      .attr("y", 550)
+      .style("font-size", "20px")
+      .style("font-weight", "bold")
+      .style("font-family", "'Poppins', sans-serif")
+      .text((d) => `${d.artist}`);
   };
 
   useEffect(() => {

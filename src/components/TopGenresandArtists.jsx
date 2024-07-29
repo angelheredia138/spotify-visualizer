@@ -33,29 +33,55 @@ const TopGenresandArtists = () => {
       const token = localStorage.getItem("spotify_access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
+      // Fetch genres data
       const genresResponse = await fetch(
         `http://localhost:8000/api/top-genres/?time_range=${timeRange}`,
         { headers }
       );
       const genresData = await genresResponse.json();
+      console.log("Fetched genres data:", genresData);
 
+      // Fetch artists data
       const artistsResponse = await fetch(
         `http://localhost:8000/api/top-artists/?time_range=${timeRange}`,
         { headers }
       );
       const artistsData = await artistsResponse.json();
+      console.log("Fetched artists data:", artistsData);
 
+      // Create a map to collect artists for each genre
+      const genreArtistsMap = new Map();
+
+      // Iterate through artists and populate the map
+      artistsData.items.forEach((artist) => {
+        artist.genres.forEach((genre) => {
+          if (!genreArtistsMap.has(genre)) {
+            genreArtistsMap.set(genre, []);
+          }
+          genreArtistsMap.get(genre).push(artist.name);
+        });
+      });
+
+      // Enrich genres data with artists, including those listed in the genres data
       const enrichedGenres = genresData.top_genres.map((genre) => {
-        if (!genre.description) {
-          const genreArtists = artistsData.items.filter((artist) =>
-            artist.genres.includes(genre.genre)
-          );
-          genre.description = `Artists: ${genreArtists
-            .map((artist) => artist.name)
-            .join(", ")}`;
-        }
+        const genreArtists = genreArtistsMap.get(genre.genre) || [];
+        const additionalArtists = genre.artists || [];
+
+        // Combine both sets of artists
+        const allArtists = [
+          ...new Set([...genreArtists, ...additionalArtists]),
+        ];
+
+        genre.description = allArtists.length
+          ? `Artists: ${allArtists.join(", ")}`
+          : "No artists available";
+
+        console.log("Enriched genre object:", genre);
         return genre;
       });
+
+      console.log("Processed top genres data:", enrichedGenres);
+
       setTopGenres(enrichedGenres);
       setLeastGenres(genresData.least_genres || []);
       setArtists(artistsData.items || []);
@@ -131,7 +157,7 @@ const TopGenresandArtists = () => {
       <SimpleGrid columns={columns} spacing={4} width="100%" padding={2}>
         <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
           <Heading as="h3" size="md" mb={4}>
-            Most Played Genres (D3.js)
+            Most Played Genres
           </Heading>
           <MostPlayedGenres
             topGenres={topGenres}

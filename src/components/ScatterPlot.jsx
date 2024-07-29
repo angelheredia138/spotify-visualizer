@@ -32,15 +32,15 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
     const svg = d3
       .select("#d3-scatter-plot")
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .attr("viewBox", `0 0 ${800} ${650}`)
+      .attr("viewBox", `0 0 ${1200} ${900}`) // Increase the size of the chart
       .classed("svg-content-responsive", true)
       .style("background-color", "transparent");
 
     svg.selectAll("*").remove(); // Clear the chart before drawing
 
-    const margin = { top: 20, right: 30, bottom: 60, left: 50 };
-    const width = 800 - margin.left - margin.right;
-    const height = 650 - margin.top - margin.bottom;
+    const margin = { top: 60, right: 60, bottom: 120, left: 100 };
+    const width = 1200 - margin.left - margin.right; // Increase the width
+    const height = 900 - margin.top - margin.bottom; // Increase the height
 
     const x = d3
       .scaleLinear()
@@ -69,7 +69,8 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
       .style("padding", "10px")
       .style("border-radius", "5px")
       .style("pointer-events", "none")
-      .style("display", "none");
+      .style("display", "none")
+      .style("font-size", "18px"); // Increase the font size of the tooltip
 
     let isHovering = false;
 
@@ -81,7 +82,7 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
       .append("circle")
       .attr("cx", (d) => x(d.energy))
       .attr("cy", (d) => y(d.danceability))
-      .attr("r", 7) // Increase the radius of the points
+      .attr("r", 10) // Increase the radius of the points
       .style("fill", "steelblue")
       .on("mouseover", function (event, d) {
         isHovering = true;
@@ -145,27 +146,39 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
     const xAxis = chart
       .append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x).ticks(10)) // Increase the number of ticks
+      .selectAll("text")
+      .style("font-size", "30px") // Increase the font size of the axis labels
+      .style("font-family", "'Poppins', sans-serif")
+      .style("font-weight", "bold");
 
-    xAxis
+    chart
       .append("text")
       .attr("x", width / 2)
-      .attr("y", 40)
+      .attr("y", height + margin.bottom - 40) // Adjust y position of x-axis label
+      .attr("text-anchor", "middle")
       .attr("fill", "#000")
-      .style("font-size", "16px")
+      .style("font-size", "30px") // Increase the font size of the axis title
       .style("font-family", "'Poppins', sans-serif")
       .style("font-weight", "bold")
       .text("Energy");
 
-    const yAxis = chart.append("g").call(d3.axisLeft(y));
+    const yAxis = chart
+      .append("g")
+      .call(d3.axisLeft(y).ticks(10)) // Increase the number of ticks
+      .selectAll("text")
+      .style("font-size", "30px") // Increase the font size of the axis labels
+      .style("font-family", "'Poppins', sans-serif")
+      .style("font-weight", "bold");
 
-    yAxis
+    chart
       .append("text")
       .attr("x", -height / 2)
-      .attr("y", -40)
-      .attr("fill", "#000")
+      .attr("y", -margin.left + 30) // Adjust y position of y-axis label
       .attr("transform", "rotate(-90)")
-      .style("font-size", "16px")
+      .attr("text-anchor", "middle")
+      .attr("fill", "#000")
+      .style("font-size", "30px") // Increase the font size of the axis title
       .style("font-family", "'Poppins', sans-serif")
       .style("font-weight", "bold")
       .text("Danceability");
@@ -180,6 +193,7 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
       className="chart-container-transparent"
       style={{ flex: 1, padding: "10px" }}
     >
+      <svg id="d3-scatter-plot" style={{ width: "100%", height: "100%" }}></svg>
       <Box className="time-range-controls">
         <Select
           value={timeRange}
@@ -192,7 +206,6 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
           <option value="long_term">All time</option>
         </Select>
       </Box>
-      <svg id="d3-scatter-plot" style={{ width: "100%", height: "100%" }}></svg>
     </Box>
   );
 };

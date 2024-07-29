@@ -114,8 +114,12 @@ const AudioFeatures = () => {
         Top Tracks Audio Features
       </Heading>
       <Text fontSize="md" className="heading">
-        Visualize the audio features of your top tracks!
+        Visualize the audio features of your top tracks! Hover or tap on the
+        radar chart to see detailed information about each track. Hover or tap
+        on each data point in the scatter plot to find out which track it
+        represents.
       </Text>
+
       <Box textAlign="center" mb={4}>
         <Button
           colorScheme="red"
@@ -143,6 +147,33 @@ const AudioFeatures = () => {
           <RadarChart tracks={tracks} />
         </Box>
       </SimpleGrid>
+      <Box className="chart-container" textAlign={"left"}>
+        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+          Audio Features Explanation
+        </Heading>
+        <Text fontSize="sm" mb={2}>
+          <strong>Danceability:</strong> Describes how suitable a track is for
+          dancing based on a combination of musical elements including tempo,
+          rhythm stability, beat strength, and overall regularity. A value of
+          0.0 is least danceable and 1.0 is most danceable.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Energy:</strong> A measure from 0.0 to 1.0 and represents a
+          perceptual measure of intensity and activity. Typically, energetic
+          tracks feel fast, loud, and noisy.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Tempo:</strong> The overall estimated tempo of a track in
+          beats per minute (BPM). In musical terminology, tempo is the speed or
+          pace of a given piece.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Valence:</strong> A measure from 0.0 to 1.0 describing the
+          musical positiveness conveyed by a track. Tracks with high valence
+          sound more positive (e.g. happy, cheerful, euphoric), while tracks
+          with low valence sound more negative (e.g. sad, depressed, angry).
+        </Text>
+      </Box>
     </div>
   );
 };

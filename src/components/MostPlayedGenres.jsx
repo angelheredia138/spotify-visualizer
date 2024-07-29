@@ -4,6 +4,8 @@ import { Select, Box } from "@chakra-ui/react";
 import "../assets/css/Components.css";
 
 const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
+  let hoverTimeout = null;
+
   useEffect(() => {
     if (topGenres.length > 0) {
       drawGenresChart(topGenres);
@@ -100,11 +102,17 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
       .style("filter", "url(#drop-shadow)")
       .on("mouseover", function (event, d) {
         isHovering = true;
-        const description = d.description || "No description available"; // Provide default description
+        const description = d.description || "No artists available"; // Provide default description
+        const maxArtists = 5;
+        const artistList = description.split(": ")[1];
+        const artists = artistList ? artistList.split(", ") : [];
+        const displayedArtists = artists.slice(0, maxArtists).join(", ");
+        const ellipsis = artists.length > maxArtists ? "..." : "";
+        const finalDescription = `Artists: ${displayedArtists}${ellipsis}`;
         tooltip
           .style("display", "block")
           .html(
-            `<strong>${d.genre}</strong><br/>Listens: ${d.count}<br/>Artists: ${description}`
+            `<strong>${d.genre}</strong><br/>Artists Count: ${d.count}<br/> ${finalDescription}`
           );
         d3.select(this).style("fill", "darkblue");
       })
@@ -112,6 +120,9 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
         tooltip
           .style("top", event.pageY - 10 + "px")
           .style("left", event.pageX + 10 + "px");
+        hoverTimeout = setTimeout(() => {
+          tooltip.style("display", "none");
+        }, 15000); // Hide the tooltip after 1 second
       })
       .on("mouseout", function () {
         isHovering = false;
@@ -134,11 +145,17 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
           .style("fill", "steelblue");
 
         if (!isHighlighted) {
-          const description = d.description || "No description available"; // Provide default description
+          const description = d.description || "No artists available"; // Provide default description
+          const maxArtists = 5;
+          const artistList = description.split(": ")[1];
+          const artists = artistList ? artistList.split(", ") : [];
+          const displayedArtists = artists.slice(0, maxArtists).join(", ");
+          const ellipsis = artists.length > maxArtists ? "..." : "";
+          const finalDescription = `Artists: ${displayedArtists}${ellipsis}`;
           tooltip
             .style("display", "block")
             .html(
-              `<strong>${d.genre}</strong><br/>Listens: ${d.count}<br/>Artists: ${description}`
+              `<strong>${d.genre}</strong><br/>Artists Count: ${d.count}<br/> ${finalDescription}`
             );
           rect.classed("highlighted", true).style("fill", "darkblue");
         } else {
@@ -160,7 +177,8 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
 
     chart
       .append("g")
-      .call(d3.axisLeft(y).tickFormat(d3.format("d"))) // Ensure solid numbers on y-axis      .selectAll("text")
+      .call(d3.axisLeft(y).tickFormat(d3.format("d"))) // Ensure solid numbers on y-axis
+      .selectAll("text")
       .style("font-size", "20px")
       .style("font-family", "'Poppins', sans-serif")
       .style("font-weight", "bold");
@@ -219,7 +237,7 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
       .attr("text-anchor", "middle")
       .style("font-size", "20px")
       .style("font-family", "'Poppins', sans-serif")
-      .text("Listens")
+      .text("Artists")
       .style("font-weight", "bold");
   };
 
