@@ -10,7 +10,6 @@ import {
   Spinner,
   Text,
   VStack,
-  SimpleGrid,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import "../css/Components.css";
@@ -18,7 +17,7 @@ import "../css/Components.css";
 const ListeningHistory = () => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const columns = useBreakpointValue({ base: 1, md: 2 });
+  const columns = useBreakpointValue({ base: 1, md: 1 });
 
   const navigate = useNavigate();
 
@@ -32,9 +31,14 @@ const ListeningHistory = () => {
         `http://localhost:8000/api/recently-played/`,
         { headers }
       );
-      const data = await response.json();
-
-      setTracks(data.items);
+      const text = await response.text();
+      try {
+        const data = JSON.parse(text);
+        setTracks(data.items || []);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        setTracks([]);
+      }
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -94,20 +98,20 @@ const ListeningHistory = () => {
           Back to Home
         </Button>
       </Box>
-      <SimpleGrid columns={columns} spacing={4} width="100%" padding={2}>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+      <Box width="100%" padding={2}>
+        <Box className="chart-container" style={{ flex: 1, padding: "20px" }}>
           <Heading as="h3" size="md" mb={4}>
             Recently Played Timeline
           </Heading>
           <TimelineChart tracks={tracks} />
         </Box>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+        <Box className="chart-container" style={{ flex: 1, padding: "20px" }}>
           <Heading as="h3" size="md" mb={4}>
             Listening Patterns Heatmap
           </Heading>
           <HeatmapChart tracks={tracks} />
         </Box>
-      </SimpleGrid>
+      </Box>
     </div>
   );
 };

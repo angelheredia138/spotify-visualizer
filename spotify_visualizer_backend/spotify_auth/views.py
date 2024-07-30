@@ -112,3 +112,15 @@ def top_genres(request):
     least_genres = [genre for genre in genres_list if genre not in top_genres]
 
     return JsonResponse({'top_genres': top_genres, 'least_genres': least_genres})
+@api_view(['GET'])
+def recently_played(request):
+    token = request.headers.get('Authorization').split(' ')[1]
+    url = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return JsonResponse(response.json(), safe=False)
+    else:
+        return JsonResponse({'error': 'Failed to fetch data'}, status=response.status_code)
