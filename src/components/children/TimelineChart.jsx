@@ -1,12 +1,16 @@
 import React, { useEffect } from "react";
 import * as d3 from "d3";
-import { Box } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import "../css/Components.css";
 
-const TimelineChart = ({ tracks }) => {
+const TimelineChart = ({ tracks, updating }) => {
   useEffect(() => {
     if (tracks.length > 0) {
       drawClockTimelineChart(tracks);
+      const interval = setInterval(() => {
+        updateClockHand();
+      }, 1000);
+      return () => clearInterval(interval);
     }
   }, [tracks]);
 
@@ -163,19 +167,7 @@ const TimelineChart = ({ tracks }) => {
     });
 
     // Draw hour hand
-    const now = new Date();
-    const currentHours = now.getHours() + now.getMinutes() / 60;
-
-    const hourAngle = (currentHours / 24) * 2 * Math.PI;
-
-    clockGroup
-      .append("line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", Math.cos(hourAngle - Math.PI / 2) * (radius - 30))
-      .attr("y2", Math.sin(hourAngle - Math.PI / 2) * (radius - 30))
-      .attr("stroke", "#000")
-      .attr("stroke-width", 4);
+    drawClockHand(clockGroup, radius);
 
     // Display the last played song below the center
     if (todayTracks.length > 0) {
@@ -234,6 +226,46 @@ const TimelineChart = ({ tracks }) => {
         .style("font-weight", "bold")
         .text(formattedTime);
     }
+
+    if (updating) {
+      clockGroup
+        .append("text")
+        .attr("class", "updating-text")
+        .attr("x", 0)
+        .attr("y", -20) // Position above the center
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style("font-size", "12px")
+        .style("font-family", "'Poppins', sans-serif")
+        .style("font-weight", "bold")
+        .text("Updating...");
+    }
+  };
+
+  const drawClockHand = (clockGroup, radius) => {
+    const now = new Date();
+    const currentHours = now.getHours() + now.getMinutes() / 60;
+    const hourAngle = (currentHours / 24) * 2 * Math.PI;
+
+    clockGroup.selectAll(".clock-hand").remove(); // Clear the existing clock hand
+
+    clockGroup
+      .append("line")
+      .attr("class", "clock-hand")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", Math.cos(hourAngle - Math.PI / 2) * (radius - 30))
+      .attr("y2", Math.sin(hourAngle - Math.PI / 2) * (radius - 30))
+      .attr("stroke", "#000")
+      .attr("stroke-width", 4);
+  };
+
+  const updateClockHand = () => {
+    const svg = d3.select("#d3-clock-timeline-chart");
+    const clockGroup = svg.select("g");
+    const radius = Math.min(400, 400) / 2 - 20;
+
+    drawClockHand(clockGroup, radius);
   };
 
   const formatTime = (date) => {
@@ -254,6 +286,15 @@ const TimelineChart = ({ tracks }) => {
         id="d3-clock-timeline-chart"
         style={{ width: "100%", height: "100%" }}
       ></svg>
+      <Text
+        mt={4}
+        textAlign="center"
+        fontSize="14px"
+        fontFamily="'Poppins', sans-serif"
+      >
+        This clock actively updates as the day goes on, displaying what song you
+        were listening to at what time.
+      </Text>
     </Box>
   );
 };

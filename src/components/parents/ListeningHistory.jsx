@@ -19,6 +19,7 @@ import "../css/Components.css";
 const ListeningHistory = () => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const columns = useBreakpointValue({ base: 1, md: 2 });
   const [isMobile] = useMediaQuery("(max-width: 768px)");
 
@@ -48,8 +49,16 @@ const ListeningHistory = () => {
     setLoading(false);
   };
 
+  const updateData = async () => {
+    setUpdating(true);
+    await fetchRecentlyPlayed();
+    setUpdating(false);
+  };
+
   useEffect(() => {
     fetchData();
+    const intervalId = setInterval(updateData, 30000); // Poll every minute
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) {
@@ -117,9 +126,9 @@ const ListeningHistory = () => {
         >
           <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
             <Heading as="h3" size="md" mb={4}>
-              Recently Played Clock Timeline
+              Recently Played Timeline
             </Heading>
-            <TimelineChart tracks={tracks} />
+            <TimelineChart tracks={tracks} updating={updating} />
           </Box>
           <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
             <Heading as="h3" size="md" mb={4}>
