@@ -13,6 +13,7 @@ import {
   VStack,
   SimpleGrid,
   useBreakpointValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import "../css/Components.css";
 
@@ -24,6 +25,7 @@ const TopGenresandArtists = () => {
   const [timeRange, setTimeRange] = useState("medium_term");
   const [loading, setLoading] = useState(true);
   const columns = useBreakpointValue({ base: 1, md: 2 });
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
 
   const navigate = useNavigate(); // Use the useNavigate hook from React Router v6
 
@@ -154,63 +156,76 @@ const TopGenresandArtists = () => {
           Back to Home
         </Button>
       </Box>
-      <SimpleGrid columns={columns} spacing={4} width="100%" padding={2}>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Most Played Genres
-          </Heading>
-          <MostPlayedGenres
-            topGenres={topGenres}
-            timeRange={timeRange}
-            setTimeRange={setTimeRange}
-          />
-        </Box>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Artist Leaderboard
-          </Heading>
-          <ArtistLeaderboard artists={artists} />
-          <Box mt={4} textAlign="center">
-            <Heading as="h3" size="md" mt={4}>
-              Generate a random genre you have listened to!
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        padding={4}
+      >
+        <SimpleGrid
+          columns={columns}
+          spacing={4}
+          width={isMobile ? "100%" : "65%"}
+          padding={2}
+        >
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Most Played Genres
             </Heading>
-            <Button
-              onClick={generateRandomGenre}
-              className="button"
-              colorScheme="green"
-              mt={2}
-            >
-              Generate Random Genre
-            </Button>
-            <Box mt={4} minHeight="50px">
-              {randomLeastGenre ? (
-                <>
-                  <Text fontSize="lg" fontWeight="bold" color="teal.500">
-                    {randomLeastGenre.genre}
-                  </Text>
-                  <Text fontSize="md" color="gray.500">
-                    ({randomLeastGenre.artist})
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text
-                    fontSize="lg"
-                    fontWeight="bold"
-                    color="transparent"
-                    userSelect={"none"}
-                  >
-                    Placeholder
-                  </Text>
-                  <Text fontSize="md" color="transparent" userSelect={"none"}>
-                    Placeholder
-                  </Text>
-                </>
-              )}
+            <MostPlayedGenres
+              topGenres={topGenres}
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+            />
+          </Box>
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Artist Leaderboard
+            </Heading>
+            <ArtistLeaderboard artists={artists} />
+            <Box mt={4} textAlign="center">
+              <Heading as="h3" size="md" mt={4}>
+                Generate a random genre you have listened to!
+              </Heading>
+              <Button
+                onClick={generateRandomGenre}
+                className="button"
+                colorScheme="green"
+                mt={2}
+              >
+                Generate Random Genre
+              </Button>
+              <Box mt={4} minHeight="50px">
+                {randomLeastGenre ? (
+                  <>
+                    <Text fontSize="lg" fontWeight="bold" color="teal.500">
+                      {randomLeastGenre.genre}
+                    </Text>
+                    <Text fontSize="md" color="gray.500">
+                      ({randomLeastGenre.artist})
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text
+                      fontSize="lg"
+                      fontWeight="bold"
+                      color="transparent"
+                      userSelect={"none"}
+                    >
+                      Placeholder
+                    </Text>
+                    <Text fontSize="md" color="transparent" userSelect={"none"}>
+                      Placeholder
+                    </Text>
+                  </>
+                )}
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </SimpleGrid>
+        </SimpleGrid>
+      </Box>
     </div>
   );
 };

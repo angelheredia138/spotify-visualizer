@@ -10,6 +10,7 @@ import {
   Text,
   VStack,
   useBreakpointValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import PieChart from "../children/PieChart";
 import WordCloud from "../children/WordCloud";
@@ -19,6 +20,7 @@ const Genres = () => {
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const columns = useBreakpointValue({ base: 1, md: 2 });
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -79,20 +81,33 @@ const Genres = () => {
           Back to Home
         </Button>
       </Box>
-      <SimpleGrid columns={columns} spacing={4} width="100%" padding={2}>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Genre Distribution Pie Chart
-          </Heading>
-          <PieChart genres={genres} />
-        </Box>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Genre Word Cloud
-          </Heading>
-          <WordCloud genres={genres} />
-        </Box>
-      </SimpleGrid>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        padding={4}
+      >
+        <SimpleGrid
+          columns={columns}
+          spacing={4}
+          width={isMobile ? "100%" : "65%"}
+          padding={2}
+        >
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Genre Distribution Pie Chart
+            </Heading>
+            <PieChart genres={genres} />
+          </Box>
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Genre Word Cloud
+            </Heading>
+            <WordCloud genres={genres} />
+          </Box>
+        </SimpleGrid>
+      </Box>
     </div>
   );
 };

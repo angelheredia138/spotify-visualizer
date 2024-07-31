@@ -4,44 +4,63 @@ import { Box } from "@chakra-ui/react";
 import "../css/Components.css";
 
 const TimelineChart = ({ tracks }) => {
-  let hoverTimeout = null;
-
   useEffect(() => {
     if (tracks.length > 0) {
-      drawTimelineChart(tracks);
+      drawClockTimelineChart(tracks);
     }
   }, [tracks]);
 
-  const drawTimelineChart = (tracks) => {
+  const drawClockTimelineChart = (tracks) => {
     const svg = d3
-      .select("#d3-timeline-chart")
+      .select("#d3-clock-timeline-chart")
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .attr("viewBox", `0 0 ${1400} ${1000}`) // Increase the size of the chart
+      .attr("viewBox", `0 0 ${400} ${400}`)
       .classed("svg-content-responsive", true)
       .style("background-color", "transparent");
 
     svg.selectAll("*").remove(); // Clear the chart before drawing
 
-    const margin = { top: 50, right: 30, bottom: 100, left: 150 }; // Increase margins
-    const width = 1400 - margin.left - margin.right;
-    const height = 800 - margin.top - margin.bottom;
+    const width = 400;
+    const height = 400;
+    const radius = Math.min(width, height) / 2 - 20;
 
-    const x = d3
-      .scaleTime()
-      .domain(d3.extent(tracks, (d) => new Date(d.played_at)))
-      .range([0, width]);
-
-    const y = d3
-      .scaleBand()
-      .domain(tracks.map((d) => d.track.name))
-      .range([0, height])
-      .padding(0.1);
-
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-    const chart = svg
+    const clockGroup = svg
       .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      .attr("transform", `translate(${width / 2},${height / 2})`);
+
+    // Draw clock face
+    clockGroup
+      .append("circle")
+      .attr("r", radius)
+      .attr("fill", "#f0f0f0")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 2);
+
+    // Add hour numbers with AM/PM labels
+    const hourScale = d3
+      .scaleLinear()
+      .domain([0, 24])
+      .range([0, 2 * Math.PI]);
+    const hours = d3.range(0, 24);
+
+    clockGroup
+      .selectAll(".hour-label")
+      .data(hours)
+      .enter()
+      .append("text")
+      .attr("class", "hour-label")
+      .attr("x", (d) => Math.cos(hourScale(d) - Math.PI / 2) * (radius - 30))
+      .attr("y", (d) => Math.sin(hourScale(d) - Math.PI / 2) * (radius - 30))
+      .attr("text-anchor", "middle")
+      .attr("alignment-baseline", "middle")
+      .style("font-size", "13px")
+      .style("font-family", "'Poppins', sans-serif")
+      .style("font-weight", "bold")
+      .text((d) => {
+        const hour = d % 12 || 12;
+        const period = d < 12 || d === 24 ? "AM" : "PM";
+        return `${hour}${period}`;
+      });
 
     // Tooltip
     const tooltip = d3
@@ -56,79 +75,174 @@ const TimelineChart = ({ tracks }) => {
       .style("pointer-events", "none")
       .style("display", "none");
 
-    chart
-      .append("g")
-      .selectAll("circle")
-      .data(tracks)
-      .enter()
-      .append("circle")
-      .attr("cx", (d) => x(new Date(d.played_at)))
-      .attr("cy", (d) => y(d.track.name) + y.bandwidth() / 2)
-      .attr("r", 12) // Increase the radius of the points
-      .style("fill", (d) => color(d.track.name))
-      .on("mouseover", function (event, d) {
-        tooltip
-          .style("display", "block")
-          .html(
-            `<strong>${d.track.name}</strong><br/>Played at: ${
-              d.played_at
-            }<br/>Artist: ${d.track.artists
-              .map((artist) => artist.name)
-              .join(", ")}`
-          );
-        d3.select(this).style("stroke", "#000").style("stroke-width", "2px");
-      })
-      .on("mousemove", function (event) {
-        tooltip
-          .style("top", event.pageY - 10 + "px")
-          .style("left", event.pageX + 10 + "px");
-      })
-      .on("mouseout", function () {
-        tooltip.style("display", "none");
-        d3.select(this).style("stroke", "none");
-      });
+    let isHovering = false;
 
-    // X-axis
-    chart
-      .append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("text")
-      .style("font-size", "18px") // Increase the font size of the axis labels
-      .style("font-family", "'Poppins', sans-serif")
-      .style("font-weight", "bold");
+    // Filter tracks to only include those played today
+    const today = new Date().toISOString().slice(0, 10);
+    const todayTracks = tracks.filter((track) =>
+      track.played_at.startsWith(today)
+    );
 
-    chart
-      .append("text")
-      .attr("x", width / 2)
-      .attr("y", height + margin.bottom - 20) // Adjust y position of x-axis label
-      .attr("text-anchor", "middle")
-      .attr("fill", "#000")
-      .style("font-size", "22px") // Increase the font size of the axis title
-      .style("font-family", "'Poppins', sans-serif")
-      .style("font-weight", "bold")
-      .text("Time");
+    // Color scale for different songs
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Y-axis
-    chart
-      .append("g")
-      .call(d3.axisLeft(y).tickFormat(() => ""))
-      .selectAll("text")
-      .style("font-size", "18px") // Increase the font size of the axis labels
-      .style("font-family", "'Poppins', sans-serif")
-      .style("font-weight", "bold");
+    // Draw data points
+    todayTracks.forEach((track, index) => {
+      const date = new Date(track.played_at);
+      const hours = date.getHours() + date.getMinutes() / 60;
+      const angle = (hours / 24) * 2 * Math.PI;
+      const offset = (index % 2 === 0 ? 1 : -1) * 0.03; // Alternate the offset direction
 
-    chart
-      .append("text")
-      .attr("x", -height / 2)
-      .attr("y", -margin.left + 50) // Adjust y position of y-axis label
-      .attr("transform", "rotate(-90)")
-      .attr("text-anchor", "middle")
-      .attr("fill", "#000")
-      .style("font-size", "22px") // Increase the font size of the axis title
-      .style("font-family", "'Poppins', sans-serif")
-      .style("font-weight", "bold")
-      .text("Songs");
+      const x = Math.cos(angle - Math.PI / 2 + offset) * (radius - 10); // Move points closer to the border
+      const y = Math.sin(angle - Math.PI / 2 + offset) * (radius - 10);
+
+      const point = clockGroup
+        .append("circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 4) // Smaller radius for the points
+        .style("fill", colorScale(index))
+        .style("opacity", 0.7) // Make the points slightly opaque
+        .on("mouseover", function (event) {
+          isHovering = true;
+          d3.select(this).transition().attr("r", 6); // Enlarge the point on hover
+          const formattedTime = formatTime(date);
+          tooltip
+            .style("display", "block")
+            .html(
+              `<strong>${
+                track.track.name
+              }</strong><br/>Played at: ${formattedTime}<br/>Artist: ${track.track.artists
+                .map((artist) => artist.name)
+                .join(", ")}`
+            );
+          d3.select(this).style("stroke", "#000").style("stroke-width", "2px");
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .style("top", event.pageY - 10 + "px")
+            .style("left", event.pageX + 10 + "px");
+        })
+        .on("mouseout", function () {
+          isHovering = false;
+          d3.select(this).transition().attr("r", 4); // Shrink the point back to original size
+          tooltip.style("display", "none");
+          d3.select(this).style("stroke", "none");
+        })
+        .on("click", function (event, d) {
+          if (isHovering) return;
+
+          const circle = d3.select(this);
+          const isHighlighted = circle.classed("highlighted");
+
+          // Remove highlight from all circles
+          d3.selectAll("circle")
+            .classed("highlighted", false)
+            .style("fill", (d, i) => colorScale(i));
+
+          if (!isHighlighted) {
+            tooltip
+              .style("display", "block")
+              .html(
+                `<strong>${
+                  track.track.name
+                }</strong><br/>Played at: ${formatTime(
+                  date
+                )}<br/>Artist: ${track.track.artists
+                  .map((artist) => artist.name)
+                  .join(", ")}`
+              );
+            circle.classed("highlighted", true).style("fill", "darkblue");
+          } else {
+            tooltip.style("display", "none");
+            circle
+              .classed("highlighted", false)
+              .style("fill", colorScale(index));
+          }
+        });
+    });
+
+    // Draw hour hand
+    const now = new Date();
+    const currentHours = now.getHours() + now.getMinutes() / 60;
+
+    const hourAngle = (currentHours / 24) * 2 * Math.PI;
+
+    clockGroup
+      .append("line")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", Math.cos(hourAngle - Math.PI / 2) * (radius - 30))
+      .attr("y2", Math.sin(hourAngle - Math.PI / 2) * (radius - 30))
+      .attr("stroke", "#000")
+      .attr("stroke-width", 4);
+
+    // Display the last played song below the center
+    if (todayTracks.length > 0) {
+      const lastPlayedTrack = todayTracks[0];
+      const lastPlayedTime = new Date(lastPlayedTrack.played_at);
+      const formattedTime = formatTime(lastPlayedTime);
+
+      clockGroup
+        .append("text")
+        .attr("class", "last-played-title")
+        .attr("x", 0)
+        .attr("y", 15) // Position below the center
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style("font-size", "12px")
+        .style("font-family", "'Poppins', sans-serif")
+        .style("font-weight", "bold")
+        .style("text-decoration", "underline")
+        .text("Last Played:");
+
+      clockGroup
+        .append("text")
+        .attr("class", "last-played-song")
+        .attr("x", 0)
+        .attr("y", 30) // Position below the title
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style("font-size", "12px")
+        .style("font-family", "'Poppins', sans-serif")
+        .style("font-weight", "bold")
+        .text(lastPlayedTrack.track.name);
+
+      clockGroup
+        .append("text")
+        .attr("class", "last-played-artist")
+        .attr("x", 0)
+        .attr("y", 45) // Position below the song name
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style("font-size", "12px")
+        .style("font-family", "'Poppins', sans-serif")
+        .style("font-weight", "bold")
+        .text(
+          lastPlayedTrack.track.artists.map((artist) => artist.name).join(", ")
+        );
+
+      clockGroup
+        .append("text")
+        .attr("class", "last-played-time")
+        .attr("x", 0)
+        .attr("y", 60) // Position below the artist name
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style("font-size", "12px")
+        .style("font-family", "'Poppins', sans-serif")
+        .style("font-weight", "bold")
+        .text(formattedTime);
+    }
+  };
+
+  const formatTime = (date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 
   return (
@@ -137,7 +251,7 @@ const TimelineChart = ({ tracks }) => {
       style={{ flex: 1, padding: "10px" }}
     >
       <svg
-        id="d3-timeline-chart"
+        id="d3-clock-timeline-chart"
         style={{ width: "100%", height: "100%" }}
       ></svg>
     </Box>

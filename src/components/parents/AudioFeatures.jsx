@@ -13,6 +13,7 @@ import {
   VStack,
   SimpleGrid,
   useBreakpointValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import "../css/Components.css";
 
@@ -21,6 +22,7 @@ const AudioFeatures = () => {
   const [timeRange, setTimeRange] = useState("medium_term");
   const [loading, setLoading] = useState(true);
   const columns = useBreakpointValue({ base: 1, md: 2 });
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
 
   const navigate = useNavigate(); // Use the useNavigate hook from React Router v6
 
@@ -129,50 +131,64 @@ const AudioFeatures = () => {
           Back to Home
         </Button>
       </Box>
-      <SimpleGrid columns={columns} spacing={4} width="100%" padding={2}>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Audio Features Scatter Plot
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        width="100%"
+        padding={2}
+      >
+        <SimpleGrid
+          columns={columns}
+          spacing={4}
+          width={isMobile ? "100%" : "65%"}
+          padding={2}
+        >
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Audio Features Scatter Plot
+            </Heading>
+            <ScatterPlot
+              tracks={tracks}
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+            />
+          </Box>
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Audio Features Radar Chart
+            </Heading>
+            <RadarChart tracks={tracks} />
+          </Box>
+        </SimpleGrid>
+        <Box className="chart-container" textAlign={"left"}>
+          <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+            Audio Features Explanation
           </Heading>
-          <ScatterPlot
-            tracks={tracks}
-            timeRange={timeRange}
-            setTimeRange={setTimeRange}
-          />
+          <Text fontSize="sm" mb={2}>
+            <strong>Danceability:</strong> Describes how suitable a track is for
+            dancing based on a combination of musical elements including tempo,
+            rhythm stability, beat strength, and overall regularity. A value of
+            0.0 is least danceable and 1.0 is most danceable.
+          </Text>
+          <Text fontSize="sm" mb={2}>
+            <strong>Energy:</strong> A measure from 0.0 to 1.0 and represents a
+            perceptual measure of intensity and activity. Typically, energetic
+            tracks feel fast, loud, and noisy.
+          </Text>
+          <Text fontSize="sm" mb={2}>
+            <strong>Tempo:</strong> The overall estimated tempo of a track in
+            beats per minute (BPM). In musical terminology, tempo is the speed
+            or pace of a given piece.
+          </Text>
+          <Text fontSize="sm" mb={2}>
+            <strong>Valence:</strong> A measure from 0.0 to 1.0 describing the
+            musical positiveness conveyed by a track. Tracks with high valence
+            sound more positive (e.g. happy, cheerful, euphoric), while tracks
+            with low valence sound more negative (e.g. sad, depressed, angry).
+          </Text>
         </Box>
-        <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Audio Features Radar Chart
-          </Heading>
-          <RadarChart tracks={tracks} />
-        </Box>
-      </SimpleGrid>
-      <Box className="chart-container" textAlign={"left"}>
-        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
-          Audio Features Explanation
-        </Heading>
-        <Text fontSize="sm" mb={2}>
-          <strong>Danceability:</strong> Describes how suitable a track is for
-          dancing based on a combination of musical elements including tempo,
-          rhythm stability, beat strength, and overall regularity. A value of
-          0.0 is least danceable and 1.0 is most danceable.
-        </Text>
-        <Text fontSize="sm" mb={2}>
-          <strong>Energy:</strong> A measure from 0.0 to 1.0 and represents a
-          perceptual measure of intensity and activity. Typically, energetic
-          tracks feel fast, loud, and noisy.
-        </Text>
-        <Text fontSize="sm" mb={2}>
-          <strong>Tempo:</strong> The overall estimated tempo of a track in
-          beats per minute (BPM). In musical terminology, tempo is the speed or
-          pace of a given piece.
-        </Text>
-        <Text fontSize="sm" mb={2}>
-          <strong>Valence:</strong> A measure from 0.0 to 1.0 describing the
-          musical positiveness conveyed by a track. Tracks with high valence
-          sound more positive (e.g. happy, cheerful, euphoric), while tracks
-          with low valence sound more negative (e.g. sad, depressed, angry).
-        </Text>
       </Box>
     </div>
   );

@@ -10,20 +10,22 @@ import {
   Spinner,
   Text,
   VStack,
+  SimpleGrid,
   useBreakpointValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import "../css/Components.css";
 
 const ListeningHistory = () => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const columns = useBreakpointValue({ base: 1, md: 1 });
+  const columns = useBreakpointValue({ base: 1, md: 2 });
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
 
   const navigate = useNavigate();
 
-  const fetchData = async () => {
+  const fetchRecentlyPlayed = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem("spotify_access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
@@ -32,18 +34,18 @@ const ListeningHistory = () => {
         { headers }
       );
       const text = await response.text();
-      try {
-        const data = JSON.parse(text);
-        setTracks(data.items || []);
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-        setTracks([]);
-      }
-      setLoading(false);
+      const data = JSON.parse(text);
+      setTracks(data.items || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
+      console.error("Error fetching recently played tracks:", error);
+      setTracks([]);
     }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    await fetchRecentlyPlayed();
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -85,8 +87,9 @@ const ListeningHistory = () => {
         Listening History
       </Heading>
       <Text fontSize="md" className="heading">
-        See your recently played tracks displayed on a timeline or heatmap,
-        showing your listening patterns.
+        Explore your recently played tracks displayed on a clock timeline or a
+        heatmap, showcasing your listening patterns and the most recent track
+        played.
       </Text>
 
       <Box textAlign="center" mb={4}>
@@ -98,19 +101,33 @@ const ListeningHistory = () => {
           Back to Home
         </Button>
       </Box>
-      <Box width="100%" padding={2}>
-        <Box className="chart-container" style={{ flex: 1, padding: "20px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Recently Played Timeline
-          </Heading>
-          <TimelineChart tracks={tracks} />
-        </Box>
-        <Box className="chart-container" style={{ flex: 1, padding: "20px" }}>
-          <Heading as="h3" size="md" mb={4}>
-            Listening Patterns Heatmap
-          </Heading>
-          <HeatmapChart tracks={tracks} />
-        </Box>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        width="100%"
+        padding={2}
+      >
+        <SimpleGrid
+          columns={columns}
+          spacing={4}
+          width={isMobile ? "100%" : "65%"}
+          padding={2}
+        >
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Recently Played Clock Timeline
+            </Heading>
+            <TimelineChart tracks={tracks} />
+          </Box>
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Listening Patterns Heatmap
+            </Heading>
+            <HeatmapChart tracks={tracks} />
+          </Box>
+        </SimpleGrid>
       </Box>
     </div>
   );
