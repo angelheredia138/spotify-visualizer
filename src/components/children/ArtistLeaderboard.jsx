@@ -5,7 +5,9 @@ import "../css/Components.css";
 
 const ArtistLeaderboard = ({ artists }) => {
   const [processedArtists, setProcessedArtists] = useState([]);
+  let isHovering = false;
   let hoverTimeout = null;
+  let clickTimeout = null;
 
   useEffect(() => {
     if (artists.length > 0) {
@@ -102,8 +104,6 @@ const ArtistLeaderboard = ({ artists }) => {
       .style("pointer-events", "none")
       .style("display", "none");
 
-    let isHovering = false;
-
     chart
       .append("g")
       .selectAll("rect")
@@ -133,7 +133,7 @@ const ArtistLeaderboard = ({ artists }) => {
           .style("left", event.pageX + 10 + "px");
         hoverTimeout = setTimeout(() => {
           tooltip.style("display", "none");
-        }, 15000); // Hide the tooltip after 1 second
+        }, 15000); // Hide the tooltip after 15 seconds
       })
       .on("mouseout", function () {
         isHovering = false;
@@ -168,6 +168,12 @@ const ArtistLeaderboard = ({ artists }) => {
           tooltip.style("display", "none");
           rect.classed("highlighted", false).style("fill", "steelblue");
         }
+
+        clearTimeout(clickTimeout); // Clear any existing timeout
+        clickTimeout = setTimeout(() => {
+          tooltip.style("display", "none");
+          rect.classed("highlighted", false).style("fill", "steelblue");
+        }, 5000); // Hide the tooltip after 5 seconds
       });
 
     const xAxis = chart

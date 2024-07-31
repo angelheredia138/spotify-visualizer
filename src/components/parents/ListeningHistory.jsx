@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TimelineChart from "../children/TimelineChart";
-import HeatmapChart from "../children/HeatmapChart";
 import {
   Box,
   Heading,
@@ -10,7 +9,6 @@ import {
   Spinner,
   Text,
   VStack,
-  SimpleGrid,
   useBreakpointValue,
   useMediaQuery,
 } from "@chakra-ui/react";
@@ -20,7 +18,7 @@ const ListeningHistory = () => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const columns = useBreakpointValue({ base: 1, md: 2 });
+  const columns = useBreakpointValue({ base: 1, md: 1 });
   const [isMobile] = useMediaQuery("(max-width: 768px)");
 
   const navigate = useNavigate();
@@ -52,12 +50,14 @@ const ListeningHistory = () => {
   const updateData = async () => {
     setUpdating(true);
     await fetchRecentlyPlayed();
-    setUpdating(false);
+    setTimeout(() => {
+      setUpdating(false);
+    }, 1000); // Delay to ensure the "Updating..." text is displayed
   };
 
   useEffect(() => {
     fetchData();
-    const intervalId = setInterval(updateData, 30000); // Poll every minute
+    const intervalId = setInterval(updateData, 30000); // Poll every 30 seconds
     return () => clearInterval(intervalId);
   }, []);
 
@@ -96,9 +96,8 @@ const ListeningHistory = () => {
         Listening History
       </Heading>
       <Text fontSize="md" className="heading">
-        Explore your recently played tracks displayed on a clock timeline or a
-        heatmap, showcasing your listening patterns and the most recent track
-        played.
+        Explore your recently played tracks displayed on a clock timeline,
+        showcasing your listening patterns and the most recent track played.
       </Text>
 
       <Box textAlign="center" mb={4}>
@@ -118,25 +117,19 @@ const ListeningHistory = () => {
         width="100%"
         padding={2}
       >
-        <SimpleGrid
-          columns={columns}
-          spacing={4}
-          width={isMobile ? "100%" : "65%"}
-          padding={2}
+        <Box
+          className="chart-container"
+          style={{
+            flex: 1,
+            padding: "10px",
+            width: isMobile ? "100%" : "30%",
+          }}
         >
-          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-            <Heading as="h3" size="md" mb={4}>
-              Recently Played Timeline
-            </Heading>
-            <TimelineChart tracks={tracks} updating={updating} />
-          </Box>
-          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
-            <Heading as="h3" size="md" mb={4}>
-              Listening Patterns Heatmap
-            </Heading>
-            <HeatmapChart tracks={tracks} />
-          </Box>
-        </SimpleGrid>
+          <Heading as="h3" size="md" mb={4}>
+            Recently Played Timeline
+          </Heading>
+          <TimelineChart tracks={tracks} updating={updating} />
+        </Box>
       </Box>
     </div>
   );

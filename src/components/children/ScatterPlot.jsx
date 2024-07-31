@@ -5,7 +5,9 @@ import "../css/Components.css";
 
 const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
   const [processedTracks, setProcessedTracks] = useState([]);
-
+  let isHovering = false;
+  let hoverTimeout = null;
+  let clickTimeout = null;
   useEffect(() => {
     if (tracks.length > 0) {
       preprocessTracks(tracks);
@@ -70,9 +72,7 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
       .style("border-radius", "5px")
       .style("pointer-events", "none")
       .style("display", "none")
-      .style("font-size", "18px"); // Increase the font size of the tooltip
-
-    let isHovering = false;
+      .style("font-size", "18px");
 
     chart
       .append("g")
@@ -82,7 +82,7 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
       .append("circle")
       .attr("cx", (d) => x(d.energy))
       .attr("cy", (d) => y(d.danceability))
-      .attr("r", 10) // Increase the radius of the points
+      .attr("r", 10)
       .style("fill", "steelblue")
       .on("mouseover", function (event, d) {
         isHovering = true;
@@ -141,6 +141,12 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
           tooltip.style("display", "none");
           circle.classed("highlighted", false).style("fill", "steelblue");
         }
+
+        clearTimeout(clickTimeout); // Clear any existing timeout
+        clickTimeout = setTimeout(() => {
+          tooltip.style("display", "none");
+          circle.classed("highlighted", false).style("fill", "steelblue");
+        }, 5000); // Hide the tooltip after 5 seconds
       });
 
     const xAxis = chart

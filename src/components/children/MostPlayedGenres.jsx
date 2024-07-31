@@ -4,8 +4,9 @@ import { Select, Box } from "@chakra-ui/react";
 import "../css/Components.css";
 
 const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
+  let isHovering = false;
   let hoverTimeout = null;
-
+  let clickTimeout = null;
   useEffect(() => {
     if (topGenres.length > 0) {
       drawGenresChart(topGenres);
@@ -85,8 +86,6 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
       .style("pointer-events", "none")
       .style("display", "none");
 
-    let isHovering = false;
-
     chart
       .append("g")
       .selectAll("rect")
@@ -102,7 +101,7 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
       .style("filter", "url(#drop-shadow)")
       .on("mouseover", function (event, d) {
         isHovering = true;
-        const description = d.description || "No artists available"; // Provide default description
+        const description = d.description || "No artists available";
         const maxArtists = 5;
         const artistList = description.split(": ")[1];
         const artists = artistList ? artistList.split(", ") : [];
@@ -122,7 +121,7 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
           .style("left", event.pageX + 10 + "px");
         hoverTimeout = setTimeout(() => {
           tooltip.style("display", "none");
-        }, 15000); // Hide the tooltip after 1 second
+        }, 15000); // Hide the tooltip after 15 seconds
       })
       .on("mouseout", function () {
         isHovering = false;
@@ -145,7 +144,7 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
           .style("fill", "steelblue");
 
         if (!isHighlighted) {
-          const description = d.description || "No artists available"; // Provide default description
+          const description = d.description || "No artists available";
           const maxArtists = 5;
           const artistList = description.split(": ")[1];
           const artists = artistList ? artistList.split(", ") : [];
@@ -162,6 +161,12 @@ const MostPlayedGenres = ({ topGenres, timeRange, setTimeRange }) => {
           tooltip.style("display", "none");
           rect.classed("highlighted", false).style("fill", "steelblue");
         }
+
+        clearTimeout(clickTimeout); // Clear any existing timeout
+        clickTimeout = setTimeout(() => {
+          tooltip.style("display", "none");
+          rect.classed("highlighted", false).style("fill", "steelblue");
+        }, 5000); // Hide the tooltip after 5 seconds
       });
 
     const xAxis = chart

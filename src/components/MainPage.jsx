@@ -46,7 +46,7 @@ const MainPage = () => {
     {
       title: "Listening History",
       description:
-        "Explore your recently played tracks displayed on a clock timeline or a heatmap, showcasing your listening patterns and the most recent track played.",
+        "Explore your recently played tracks displayed on a clock timeline, showcasing your listening patterns and the most recent track played.",
       path: "/listening-history",
     },
     {
