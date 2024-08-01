@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MostPlayedGenres from "../children/MostPlayedGenres";
 import ArtistLeaderboard from "../children/ArtistLeaderboard";
+import { motion } from "framer-motion";
 import {
   Select,
   Box,
@@ -134,7 +135,12 @@ const TopGenresandArtists = () => {
   }
 
   return (
-    <div className="animated-background">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="animated-background"
+    >
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Genre Ranking and Artist Leaderboard!
       </Heading>
@@ -251,7 +257,7 @@ const TopGenresandArtists = () => {
           </Box>
         </SimpleGrid>
       </Box>
-    </div>
+    </motion.div>
   );
 };
 export default TopGenresandArtists;

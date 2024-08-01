@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TimelineChart from "../children/TimelineChart";
+import { motion } from "framer-motion";
 import {
   Box,
   Heading,
@@ -91,7 +92,12 @@ const ListeningHistory = () => {
   }
 
   return (
-    <div className="animated-background">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="animated-background"
+    >
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Listening History
       </Heading>
@@ -151,7 +157,7 @@ const ListeningHistory = () => {
           <TimelineChart tracks={tracks} updating={updating} />
         </Box>
       </Box>
-    </div>
+    </motion.div>
   );
 };
 export default ListeningHistory;

@@ -163,7 +163,7 @@ const NetworkGraph = ({ playlists, isMobile }) => {
         clearTimeout(clickTimeout);
         clickTimeout = setTimeout(() => {
           tooltip.style("display", "none");
-        }, 5000);
+        }, 3000);
       });
 
     link
@@ -198,7 +198,7 @@ const NetworkGraph = ({ playlists, isMobile }) => {
         clearTimeout(clickTimeout);
         clickTimeout = setTimeout(() => {
           tooltip.style("display", "none");
-        }, 5000);
+        }, 3000);
       });
 
     simulation.on("tick", () => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Box,
   Heading,
@@ -74,7 +75,12 @@ const Playlists = () => {
   }
 
   return (
-    <div className="animated-background">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="animated-background"
+    >
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Playlists
       </Heading>
@@ -133,7 +139,7 @@ const Playlists = () => {
           <NetworkGraph playlists={playlists} isMobile={isMobile} />
         </Box>
       </Box>
-    </div>
+    </motion.div>
   );
 };
 

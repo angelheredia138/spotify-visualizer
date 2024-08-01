@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ScatterPlot from "../children/ScatterPlot";
 import RadarChart from "../children/RadarChart";
+import { motion } from "framer-motion";
 import {
   Select,
   Box,
@@ -107,7 +108,12 @@ const AudioFeatures = () => {
   }
 
   return (
-    <div className="animated-background">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="animated-background"
+    >
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Top Tracks Audio Features
       </Heading>
@@ -211,7 +217,7 @@ const AudioFeatures = () => {
           </Text>
         </Box>
       </Box>
-    </div>
+    </motion.div>
   );
 };
 export default AudioFeatures;
