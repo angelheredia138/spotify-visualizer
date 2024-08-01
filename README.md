@@ -11,38 +11,6 @@ Welcome to the Spotify Visualizer! This website offers an interactive and visual
 - **Playlists**: Explore your created and followed playlists using network graphs showing relationships between playlists, tracks, and artists.
 - **Classic Spotify Wrapped**: Relive your music journey with a nostalgic view of your top tracks, artists, and genres, accompanied by engaging visualizations.
 
-## Installation
-
-1. Clone the repository:
-
-   \`\`\`sh
-   git clone https://github.com/your-username/spotify-visualizer.git
-   \`\`\`
-
-2. Navigate to the project directory:
-
-   \`\`\`sh
-   cd spotify-visualizer
-   \`\`\`
-
-3. Install the dependencies:
-
-   \`\`\`sh
-   npm install
-   \`\`\`
-
-4. Start the development server:
-
-   \`\`\`sh
-   npm start
-   \`\`\`
-
-## Usage
-
-1. Open your browser and navigate to `http://localhost:3000`.
-2. Log in with your Spotify account to allow the application to access your Spotify data.
-3. Explore the various visualizations available in the app.
-
 ## Technologies Used
 
 - **React**: A JavaScript library for building user interfaces.
@@ -52,41 +20,9 @@ Welcome to the Spotify Visualizer! This website offers an interactive and visual
 - **react-scroll**: A library for smooth scrolling in React.
 - **Spotify Web API**: An interface that provides access to Spotify’s catalog and user data.
 
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch:
-
-   \`\`\`sh
-   git checkout -b feature/your-feature-name
-   \`\`\`
-
-3. Make your changes and commit them:
-
-   \`\`\`sh
-   git commit -m 'Add some feature'
-   \`\`\`
-
-4. Push to the branch:
-
-   \`\`\`sh
-   git push origin feature/your-feature-name
-   \`\`\`
-
-5. Open a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Thanks to [Spotify](https://www.spotify.com) for providing the API that makes this project possible.
-- Special thanks to all the contributors and users of this project.
-
 ## Contact
 
-If you have any questions, feel free to reach out to the project maintainer at [your-email@example.com].
+If you have any questions, feel free to reach out to me.
 
 ---
 
