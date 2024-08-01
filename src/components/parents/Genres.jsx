@@ -10,6 +10,7 @@ import {
   VStack,
   useBreakpointValue,
   useMediaQuery,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import PieChart from "../children/PieChart";
 import WordCloud from "../children/WordCloud";
@@ -100,65 +101,81 @@ const Genres = () => {
         </Button>
       </Box>
       <Box
+        className="chart-container"
+        textAlign={"left"}
+        width={isMobile ? "100%" : "65%"}
+        margin="auto"
+        mt={4}
+      >
+        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+          Chart Explanations
+        </Heading>
+        <Text fontSize="sm" mb={2}>
+          <strong>Genre Word Cloud:</strong> Visualizes the genres you have
+          listened to in a word cloud format. The size of each genre name is
+          proportional to the number of listens. Hover or tap on a genre name to
+          see its full name if it is truncated.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Genre Distribution Pie Chart:</strong> Displays the
+          distribution of your favorite genres in a pie chart format. Hover or
+          tap on each slice to see more details. Genres with only one artist
+          listen are grouped together and listed below the chart.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          These charts are created using D3.js.
+        </Text>
+      </Box>
+      <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
         width="100%"
-        padding={4}
+        padding={2}
       >
-        <Box
-          className="chart-container"
-          style={{
-            flex: 1,
-            padding: "10px",
-            width: isMobile ? "100%" : "40%",
-            height: "600px", // Set a fixed height
-          }}
+        <SimpleGrid
+          columns={columns}
+          spacing={4}
+          width={isMobile ? "100%" : "65%"}
+          padding={2}
         >
-          <Heading as="h3" size="md" mb={4}>
-            Genre Word Cloud
-          </Heading>
-          <WordCloud genres={genres} />
-          <Text
-            mt={4}
-            textAlign="center"
-            fontSize="14px"
-            fontFamily="'Poppins', sans-serif"
-          >
-            Hover or tap the genre name if it is cut off to read the full name!
-          </Text>
-        </Box>
-        <Box
-          className="chart-container"
-          style={{
-            flex: 1,
-            padding: "10px",
-            width: isMobile ? "100%" : "40%",
-            marginTop: "20px", // Add some space between the charts
-            height: "600px", // Set a fixed height
-          }}
-        >
-          <Heading as="h3" size="md" mb={4}>
-            Genre Distribution Pie Chart
-          </Heading>
-          <PieChart genres={genres} />
-          {oneCountGenres.length > 0 && (
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Genre Word Cloud
+            </Heading>
             <Text
               mt={4}
               textAlign="center"
               fontSize="14px"
               fontFamily="'Poppins', sans-serif"
             >
-              Genres that had one artist listen but didn't fit the chart cause
-              it would look dumb: {displayedOneCountGenres.join(", ")}
-              {moreCountText}
+              Hover or tap the genre name if it is cut off to read the full
+              name!
             </Text>
-          )}
-        </Box>
+            <WordCloud genres={genres} />
+          </Box>
+          <Box className="chart-container" style={{ flex: 1, padding: "10px" }}>
+            <Heading as="h3" size="md" mb={4}>
+              Genre Distribution Pie Chart
+            </Heading>
+            <PieChart genres={genres} />
+            {oneCountGenres.length > 0 && (
+              <Text
+                mt={4}
+                textAlign="center"
+                fontSize="14px"
+                fontFamily="'Poppins', sans-serif"
+              >
+                Genres that had one artist listen but didn't fit the chart cause
+                it would look dumb: {displayedOneCountGenres.join(", ")}
+                {moreCountText}
+              </Text>
+            )}
+          </Box>
+        </SimpleGrid>
       </Box>
     </div>
   );
 };
-
 export default Genres;

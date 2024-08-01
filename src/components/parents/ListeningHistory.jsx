@@ -95,11 +95,10 @@ const ListeningHistory = () => {
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Listening History
       </Heading>
-      <Text fontSize="md" className="heading">
+      <Text fontSize="md" className="heading" mb={4}>
         Explore your recently played tracks displayed on a clock timeline,
         showcasing your listening patterns and the most recent track played.
       </Text>
-
       <Box textAlign="center" mb={4}>
         <Button
           colorScheme="red"
@@ -108,6 +107,27 @@ const ListeningHistory = () => {
         >
           Back to Home
         </Button>
+      </Box>
+      <Box
+        className="chart-container"
+        textAlign={"left"}
+        width={isMobile ? "100%" : "65%"}
+        margin="auto"
+        mt={4}
+      >
+        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+          Chart Explanation
+        </Heading>
+        <Text fontSize="sm" mb={2}>
+          <strong>Recently Played Timeline:</strong> This chart displays your
+          recently played tracks on a clock timeline, allowing you to see your
+          listening patterns and identify the most recent track played. Each dot
+          on the timeline represents a track, and the position of the dot
+          corresponds to the time you listened to the track.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          This chart is created using D3.js.
+        </Text>
       </Box>
       <Box
         display="flex"
@@ -134,5 +154,4 @@ const ListeningHistory = () => {
     </div>
   );
 };
-
 export default ListeningHistory;

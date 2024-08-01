@@ -115,13 +115,12 @@ const AudioFeatures = () => {
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Top Tracks Audio Features
       </Heading>
-      <Text fontSize="md" className="heading">
+      <Text fontSize="md" className="heading" mb={4}>
         Visualize the audio features of your top tracks! Hover or tap on the
         radar chart to see detailed information about each track. Hover or tap
         on each data point in the scatter plot to find out which track it
         represents.
       </Text>
-
       <Box textAlign="center" mb={4}>
         <Button
           colorScheme="red"
@@ -130,6 +129,32 @@ const AudioFeatures = () => {
         >
           Back to Home
         </Button>
+      </Box>
+      <Box
+        className="chart-container"
+        textAlign={"left"}
+        width={isMobile ? "100%" : "65%"}
+        margin="auto"
+        mt={4}
+      >
+        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+          Chart Explanations
+        </Heading>
+        <Text fontSize="sm" mb={2}>
+          <strong>Audio Features Scatter Plot:</strong> This scatter plot
+          visualizes the audio features of your top tracks. Each point
+          represents a track, plotted based on its energy and danceability.
+          Hover or tap on a point to see more details about the track.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Audio Features Radar Chart:</strong> This radar chart displays
+          the audio features of selected tracks. The chart shows danceability,
+          energy, tempo, and valence of each track. Hover or tap on the chart to
+          see detailed information about each track.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          These charts are created using D3.js.
+        </Text>
       </Box>
       <Box
         display="flex"
@@ -193,5 +218,4 @@ const AudioFeatures = () => {
     </div>
   );
 };
-
 export default AudioFeatures;

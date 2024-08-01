@@ -143,7 +143,7 @@ const TopGenresandArtists = () => {
       <Heading as="h2" size="lg" mb={4} className="heading" paddingTop={"10px"}>
         Genre Ranking and Artist Leaderboard!
       </Heading>
-      <Text fontSize="md" className="heading">
+      <Text fontSize="md" className="heading" mb={4}>
         Hover over or tap the bars for additional details about the artist and
         genre!
       </Text>
@@ -157,11 +157,41 @@ const TopGenresandArtists = () => {
         </Button>
       </Box>
       <Box
+        className="chart-container"
+        textAlign={"left"}
+        width={isMobile ? "100%" : "65%"}
+        margin="auto"
+        mt={4}
+      >
+        <Heading as="h4" size="md" mb={2} textAlign={"center"}>
+          Chart Explanations
+        </Heading>
+        <Text fontSize="sm" mb={2}>
+          <strong>Most Played Genres:</strong> Displays the top genres you have
+          listened to in the selected time range. Hover or tap on the bars to
+          see the count of artists contributing to each genre.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Artist Leaderboard:</strong> Shows the most listened-to
+          artists in the selected time range. Hover or tap on the bars to get
+          more details about each artist and their popularity.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          <strong>Random Genre Generator:</strong> Generate a random genre you
+          have listened to at least once. This can help you discover less
+          frequently played genres in your listening history.
+        </Text>
+        <Text fontSize="sm" mb={2}>
+          These charts are created using D3.js.
+        </Text>
+      </Box>
+      <Box
         display="flex"
-        justifyContent="center"
+        flexDirection="column"
         alignItems="center"
+        justifyContent="center"
         width="100%"
-        padding={4}
+        padding={2}
       >
         <SimpleGrid
           columns={columns}
@@ -229,5 +259,4 @@ const TopGenresandArtists = () => {
     </div>
   );
 };
-
 export default TopGenresandArtists;
