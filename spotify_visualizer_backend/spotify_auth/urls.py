@@ -9,7 +9,10 @@ from .views import (
     get_genres,
     get_playlists,
     get_wrapped_data,
-    
+    get_total_listening_time,
+    get_unique_artists,
+    get_unique_genres,
+    get_trends_insights,
 )
 
 urlpatterns = [
@@ -22,4 +25,7 @@ urlpatterns = [
     path('genres/', get_genres, name='get_genres'),
     path('playlists/', get_playlists, name='get_playlists'),
     path('wrapped/', get_wrapped_data, name='get_wrapped_data'),
+    path('total_listening_time/', get_total_listening_time, name='get_total_listening_time'),    path('unique_genres/', get_unique_genres, name='get_unique_genres'),
+    path('unique_artists/', get_unique_artists, name='get_unique_artists'),
+    path('trends_insights/', get_trends_insights, name='get_trends_insights'),
 ]

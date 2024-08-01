@@ -7,6 +7,7 @@ from django.http import JsonResponse
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from .utils import get_spotify_access_token
+import datetime
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -190,23 +191,189 @@ def get_wrapped_data(request):
         'Authorization': f'Bearer {token}'
     }
 
-    # Fetch top artists
-    artists_response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
-    top_artists = artists_response.json() if artists_response.status_code == 200 else []
+    # Fetch top artist
+    top_artist_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=1&time_range=long_term', headers=headers)
+    top_artist = top_artist_response.json().get('items', [])[0] if top_artist_response.status_code == 200 else None
 
-    # Fetch top tracks
-    tracks_response = requests.get('https://api.spotify.com/v1/me/top/tracks', headers=headers)
-    top_tracks = tracks_response.json() if tracks_response.status_code == 200 else []
+    # Fetch top track
+    top_track_response = requests.get('https://api.spotify.com/v1/me/top/tracks?limit=1&time_range=long_term', headers=headers)
+    top_track = top_track_response.json().get('items', [])[0] if top_track_response.status_code == 200 else None
 
-    # Fetch recently played tracks
-    recent_response = requests.get('https://api.spotify.com/v1/me/player/recently-played', headers=headers)
-    recently_played = recent_response.json() if recent_response.status_code == 200 else []
+    # Fetch top genres from top artists
+    genres_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=50&time_range=long_term', headers=headers)
+    if genres_response.status_code == 200:
+        artists = genres_response.json().get('items', [])
+        genres = {}
+        for artist in artists:
+            for genre in artist.get('genres', []):
+                if genre in genres:
+                    genres[genre] += 1
+                else:
+                    genres[genre] = 1
+        top_genre = max(genres, key=genres.get) if genres else None
+    else:
+        top_genre = None
+
+    # Fetch top 5 artists
+    top_artists_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=5&time_range=long_term', headers=headers)
+    if top_artists_response.status_code == 200:
+        top_artists = top_artists_response.json().get('items', [])
+        top_artists_data = [{
+            'name': artist['name'],
+            'image': artist['images'][0]['url'] if artist.get('images') else '',
+            'playcount': artist['popularity']  # Spotify does not provide play count directly
+        } for artist in top_artists]
+    else:
+        top_artists_data = []
+
+    # Fetch recently played tracks to calculate total listening time and unique artists
+    recent_tracks_response = requests.get('https://api.spotify.com/v1/me/player/recently-played?limit=50', headers=headers)
+    if recent_tracks_response.status_code == 200:
+        recent_tracks = recent_tracks_response.json().get('items', [])
+        total_listening_time = sum([item['track']['duration_ms'] for item in recent_tracks]) // (1000 * 60 * 60)  # convert ms to hours
+        unique_artists = len(set([artist['id'] for item in recent_tracks for artist in item['track']['artists']]))
+        unique_genres = len(set([genre for artist in artists for genre in artist.get('genres', [])]))
+    else:
+        total_listening_time = 0
+        unique_artists = 0
+        unique_genres = 0
+
+    # Calculate trends and insights
+    # Example trends: Most popular genre, most active listening time, etc.
+    trends = f"Your top genre is {top_genre}. You love listening to music in the evenings!"
 
     # Combine data into one response
     wrapped_data = {
-        'top_artists': top_artists,
-        'top_tracks': top_tracks,
-        'recently_played': recently_played
+        'top_artist': {
+            'name': top_artist['name'],
+            'image': top_artist['images'][0]['url'] if top_artist and top_artist.get('images') else '',
+        } if top_artist else None,
+        'top_track': {
+            'title': top_track['name'],
+            'artist': top_track['artists'][0]['name'] if top_track and top_track.get('artists') else '',
+        } if top_track else None,
+        'top_genre': top_genre,
+        'top_artists': top_artists_data,
+        'listening_time': total_listening_time,
+        'unique_genres': unique_genres,
+        'unique_artists': unique_artists,
+        'trends': trends
     }
 
     return JsonResponse(wrapped_data)
+
+@api_view(['GET'])
+def get_total_listening_time(request):
+    token = get_spotify_access_token()
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    total_listening_time = 0
+    last_month = (datetime.datetime.now() - datetime.timedelta(days=30)).timestamp() * 1000  # Convert to milliseconds
+
+    url = f'https://api.spotify.com/v1/me/player/recently-played?limit=50&after={int(last_month)}'
+    while url:
+        recent_tracks_response = requests.get(url, headers=headers)
+        if recent_tracks_response.status_code == 200:
+            recent_tracks = recent_tracks_response.json()
+            total_listening_time += sum([item['track']['duration_ms'] for item in recent_tracks.get('items', [])]) // (1000 * 60 * 60)  # convert ms to hours
+            url = recent_tracks.get('next')  # get the next page URL
+        else:
+            url = None
+
+    return JsonResponse({'total_listening_time': total_listening_time})
+
+@api_view(['GET'])
+def get_unique_genres(request):
+    token = get_spotify_access_token()
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    # Fetch top artists to gather genres
+    genres_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=50&time_range=long_term', headers=headers)
+    if genres_response.status_code == 200:
+        artists = genres_response.json().get('items', [])
+        unique_genres = len(set([genre for artist in artists for genre in artist.get('genres', [])]))
+    else:
+        unique_genres = 0
+
+    return JsonResponse({'unique_genres': unique_genres})
+
+@api_view(['GET'])
+def get_unique_artists(request):
+    token = get_spotify_access_token()
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    # Fetch top artists for unique artist count
+    artists_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=50&time_range=long_term', headers=headers)
+    if artists_response.status_code == 200:
+        artists = artists_response.json().get('items', [])
+        unique_artists = len(artists)
+    else:
+        unique_artists = 0
+
+    return JsonResponse({'unique_artists': unique_artists})
+
+@api_view(['GET'])
+def get_trends_insights(request):
+    token = get_spotify_access_token()
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    # Fetch recently played tracks for the last month to analyze listening patterns
+    last_month = (datetime.datetime.now() - datetime.timedelta(days=30)).timestamp() * 1000  # Convert to milliseconds
+    url = f'https://api.spotify.com/v1/me/player/recently-played?limit=50&after={int(last_month)}'
+
+    listening_times = []
+
+    while url:
+        recent_tracks_response = requests.get(url, headers=headers)
+        if recent_tracks_response.status_code == 200:
+            recent_tracks = recent_tracks_response.json()
+            listening_times.extend([item['played_at'] for item in recent_tracks.get('items', [])])
+            url = recent_tracks.get('next')  # get the next page URL
+        else:
+            url = None
+
+    # Analyze listening times to find the most active listening period
+    if listening_times:
+        hours = [datetime.datetime.fromisoformat(time.replace('Z', '+00:00')).hour for time in listening_times]
+        most_active_hour = max(set(hours), key=hours.count)
+
+        # Convert hour to time of day
+        if 5 <= most_active_hour < 12:
+            time_of_day = "morning"
+        elif 12 <= most_active_hour < 17:
+            time_of_day = "afternoon"
+        elif 17 <= most_active_hour < 21:
+            time_of_day = "evening"
+        else:
+            time_of_day = "night"
+        
+        trends = f"You most frequently listen to music in the {time_of_day}."
+    else:
+        trends = "We couldn't determine your most active listening period."
+
+    # Fetch top genres
+    genres_response = requests.get('https://api.spotify.com/v1/me/top/artists?limit=50&time_range=medium_term', headers=headers)
+    if genres_response.status_code == 200:
+        artists = genres_response.json().get('items', [])
+        genres = {}
+        for artist in artists:
+            for genre in artist.get('genres', []):
+                if genre in genres:
+                    genres[genre] += 1
+                else:
+                    genres[genre] = 1
+        top_genre = max(genres, key=genres.get) if genres else None
+    else:
+        top_genre = None
+
+    trends += f" Your top genre is {top_genre}."
+
+    return JsonResponse({'trends': trends})
