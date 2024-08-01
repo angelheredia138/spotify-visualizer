@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Box,
   Button,
@@ -63,71 +64,95 @@ const MainPage = () => {
     },
     {
       title: "Classic Spotify Wrapped",
-      description: "tbd",
+      description:
+        "Relive your music journey with a nostalgic view of your top tracks, artists, and genres, accompanied by engaging visualizations.",
       path: "/wrapped",
     },
   ];
 
   return (
-    <Flex
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       className="animated-background"
       minHeight="100vh"
       width="100vw"
+      display="flex"
       alignItems="center"
       justifyContent="center"
       color="white"
       p={6}
     >
-      <VStack spacing={6} width="100%">
-        <Heading fontSize="2xl" fontWeight="bold">
-          Welcome to Spotify Visualizer
-        </Heading>
+      <Flex
+        className="animated-background"
+        minHeight="100vh"
+        width="100vw"
+        alignItems="center"
+        justifyContent="center"
+        color="white"
+        p={6}
+      >
+        <VStack spacing={6} width="100%">
+          <Heading fontSize="2xl" fontWeight="bold">
+            Welcome to Spotify Visualizer
+          </Heading>
+          <Text fontSize="lg" textAlign="center" mb={4}>
+            This website offers an interactive and visually engaging way to
+            explore your Spotify listening habits. Dive into detailed analyses
+            and visualizations of your top genres, artists, tracks, and more.
+          </Text>
 
-        <Grid
-          templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }}
-          gap={6}
-          width="100%"
-          className={expanded !== null ? "blur-background" : ""}
-        >
-          {visualizations.map((vis, index) => (
-            <Box
-              key={index}
-              p={4}
-              borderWidth={1}
-              borderRadius="md"
-              bg="white"
-              color="black"
-              textAlign="center"
-              boxShadow="lg"
-              onClick={() => handleExpand(index)}
-              cursor="pointer"
-              className="grid-item"
-            >
-              <Heading fontSize="lg">{vis.title}</Heading>
+          <Grid
+            templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }}
+            gap={6}
+            width="100%"
+            className={expanded !== null ? "blur-background" : ""}
+          >
+            {visualizations.map((vis, index) => (
+              <Box
+                key={index}
+                p={4}
+                borderWidth={1}
+                borderRadius="md"
+                bg="white"
+                color="black"
+                textAlign="center"
+                boxShadow="lg"
+                onClick={() => handleExpand(index)}
+                cursor="pointer"
+                className="grid-item"
+              >
+                <Heading fontSize="lg">{vis.title}</Heading>
+              </Box>
+            ))}
+          </Grid>
+          {expanded !== null && (
+            <Box className="expanded-box">
+              <Heading fontSize="lg">{visualizations[expanded].title}</Heading>
+              <Text mt={4}>{visualizations[expanded].description}</Text>
+              <Button
+                mt={4}
+                colorScheme="blue"
+                onClick={() => handleNavigate(visualizations[expanded].path)}
+              >
+                View {visualizations[expanded].title}
+              </Button>
+              <Button
+                mt={4}
+                colorScheme="red"
+                onClick={() => setExpanded(null)}
+              >
+                Close
+              </Button>
             </Box>
-          ))}
-        </Grid>
-        {expanded !== null && (
-          <Box className="expanded-box">
-            <Heading fontSize="lg">{visualizations[expanded].title}</Heading>
-            <Text mt={4}>{visualizations[expanded].description}</Text>
-            <Button
-              mt={4}
-              colorScheme="blue"
-              onClick={() => handleNavigate(visualizations[expanded].path)}
-            >
-              View {visualizations[expanded].title}
-            </Button>
-            <Button mt={4} colorScheme="red" onClick={() => setExpanded(null)}>
-              Close
-            </Button>
-          </Box>
-        )}
-        <Button colorScheme="red" onClick={handleLogout}>
-          Logout
-        </Button>
-      </VStack>
-    </Flex>
+          )}
+          <Button colorScheme="red" onClick={handleLogout}>
+            Logout
+          </Button>
+        </VStack>
+      </Flex>
+    </motion.div>
   );
 };
 
