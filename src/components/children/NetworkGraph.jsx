@@ -6,7 +6,7 @@ import "../css/Components.css";
 const NetworkGraph = ({ playlists, isMobile }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [hoverTimeout, setHoverTimeout] = useState(null);
-  const [clickTimeout, setClickTimeout] = useState(null);
+  let clickTimeout = null; // Change this from const to let
   const [connections, setConnections] = useState([]);
 
   useEffect(() => {
