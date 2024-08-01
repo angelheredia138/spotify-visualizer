@@ -22,7 +22,7 @@ const TimelineChart = ({ tracks, updating }) => {
   useEffect(() => {
     if (updating) {
       setShowUpdating(true);
-      setTimeout(() => setShowUpdating(false), 1000); // Show updating for 3 seconds
+      setTimeout(() => setShowUpdating(false), 2000); // Show updating for 2 seconds
     }
   }, [updating]);
 
@@ -30,14 +30,14 @@ const TimelineChart = ({ tracks, updating }) => {
     const svg = d3
       .select("#d3-clock-timeline-chart")
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .attr("viewBox", `0 0 ${400} ${400}`)
+      .attr("viewBox", `0 0 ${400} ${500}`)
       .classed("svg-content-responsive", true)
       .style("background-color", "transparent");
 
     svg.selectAll("*").remove(); // Clear the chart before drawing
 
     const width = 400;
-    const height = 400;
+    const height = 500;
     const radius = Math.min(width, height) / 2 - 20;
 
     const clockGroup = svg
@@ -93,8 +93,14 @@ const TimelineChart = ({ tracks, updating }) => {
 
     // Filter tracks to include those played today and yesterday
     const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+      .toISOString()
+      .slice(0, 10);
     const todayTracks = tracks.filter((track) =>
       track.played_at.startsWith(today)
+    );
+    const yesterdayTracks = tracks.filter((track) =>
+      track.played_at.startsWith(yesterday)
     );
 
     // Color scale for today's songs
@@ -103,8 +109,8 @@ const TimelineChart = ({ tracks, updating }) => {
     const now = new Date();
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
 
-    // Draw data points
-    tracks.forEach((track, index) => {
+    // Draw data points for today
+    todayTracks.forEach((track, index) => {
       const date = new Date(track.played_at);
       const hours = date.getHours() + date.getMinutes() / 60;
       const angle = (hours / 24) * 2 * Math.PI;
@@ -113,16 +119,16 @@ const TimelineChart = ({ tracks, updating }) => {
       const x = Math.cos(angle - Math.PI / 2 + offset) * (radius - 10); // Move points closer to the border
       const y = Math.sin(angle - Math.PI / 2 + offset) * (radius - 10);
 
-      const pointColor =
-        hours * 60 > currentTimeInMinutes ? "gray" : colorScale(index);
+      const pointColor = colorScale(index);
 
-      const point = clockGroup
+      clockGroup
         .append("circle")
         .attr("cx", x)
         .attr("cy", y)
         .attr("r", 4) // Smaller radius for the points
         .style("fill", pointColor)
         .style("opacity", 0.7) // Make the points slightly opaque
+        .attr("data-time", date.getTime()) // Store the time in milliseconds
         .on("mouseover", function (event) {
           setIsHovering(true);
           clearTimeout(hoverTimeout);
@@ -182,6 +188,94 @@ const TimelineChart = ({ tracks, updating }) => {
         });
     });
 
+    // Draw data points for yesterday
+    yesterdayTracks.forEach((track, index) => {
+      const date = new Date(track.played_at);
+      const hours = date.getHours() + date.getMinutes() / 60;
+      const angle = (hours / 24) * 2 * Math.PI;
+      const offset = (index % 2 === 0 ? 1 : -1) * 0.03; // Alternate the offset direction
+
+      const x = Math.cos(angle - Math.PI / 2 + offset) * (radius - 10); // Move points closer to the border
+      const y = Math.sin(angle - Math.PI / 2 + offset) * (radius - 10);
+
+      const pointColor = "gray";
+
+      if (hours * 60 > currentTimeInMinutes) {
+        clockGroup
+          .append("circle")
+          .attr("cx", x)
+          .attr("cy", y)
+          .attr("r", 4) // Smaller radius for the points
+          .style("fill", pointColor)
+          .style("opacity", 0.7) // Make the points slightly opaque
+          .attr("data-time", date.getTime()) // Store the time in milliseconds
+          .attr("class", "gray-point") // Add a class for gray points
+          .on("mouseover", function (event) {
+            setIsHovering(true);
+            clearTimeout(hoverTimeout);
+            d3.select(this).transition().attr("r", 6); // Enlarge the point on hover
+            const formattedTime = formatTime(date);
+            tooltip
+              .style("display", "block")
+              .html(
+                `<strong>${
+                  track.track.name
+                }</strong><br/>Played at: ${formattedTime}<br/>Artist: ${track.track.artists
+                  .map((artist) => artist.name)
+                  .join(", ")}`
+              );
+            d3.select(this)
+              .style("stroke", "#000")
+              .style("stroke-width", "2px");
+
+            setHoverTimeout(
+              setTimeout(() => {
+                tooltip.style("display", "none");
+              }, 5000)
+            ); // Hide the tooltip after 5 seconds
+          })
+          .on("mousemove", function (event) {
+            tooltip
+              .style("top", event.pageY - 10 + "px")
+              .style("left", event.pageX + 10 + "px");
+          })
+          .on("mouseout", function () {
+            setIsHovering(false);
+            clearTimeout(hoverTimeout); // Clear the hover timeout
+            tooltip.style("display", "none");
+            d3.select(this).transition().attr("r", 4); // Shrink the point back to original size
+            d3.select(this).style("stroke", "none");
+          })
+          .on("click", function (event, d) {
+            if (isHovering) return;
+            d3.select(this).transition().attr("r", 6); // Enlarge the point on click
+            tooltip
+              .style("display", "block")
+              .html(
+                `<strong>${
+                  track.track.name
+                }</strong><br/>Played at: ${formatTime(
+                  date
+                )}<br/>Artist: ${track.track.artists
+                  .map((artist) => artist.name)
+                  .join(", ")}`
+              );
+            d3.select(this)
+              .style("stroke", "#000")
+              .style("stroke-width", "2px");
+
+            clearTimeout(clickTimeout); // Clear any existing timeout
+            setClickTimeout(
+              setTimeout(() => {
+                tooltip.style("display", "none");
+                d3.select(this).transition().attr("r", 4); // Shrink the point back to original size
+                d3.select(this).style("stroke", "none");
+              }, 5000)
+            ); // Hide the tooltip after 5 seconds
+          });
+      }
+    });
+
     // Draw hour hand
     drawClockHand(clockGroup, radius);
 
@@ -195,10 +289,10 @@ const TimelineChart = ({ tracks, updating }) => {
         .append("text")
         .attr("class", "last-played-title")
         .attr("x", 0)
-        .attr("y", -50) // Position above the center
+        .attr("y", -radius - 60) // Adjust this value to position it at the top
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .style("font-size", "12px")
+        .style("font-size", "14px")
         .style("font-family", "'Poppins', sans-serif")
         .style("font-weight", "bold")
         .style("text-decoration", "underline")
@@ -208,10 +302,10 @@ const TimelineChart = ({ tracks, updating }) => {
         .append("text")
         .attr("class", "last-played-song")
         .attr("x", 0)
-        .attr("y", -35) // Position below the title
+        .attr("y", -radius - 45) // Adjust this value to position it at the top
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .style("font-size", "12px")
+        .style("font-size", "14px")
         .style("font-family", "'Poppins', sans-serif")
         .style("font-weight", "bold")
         .text(lastPlayedTrack.track.name);
@@ -220,10 +314,10 @@ const TimelineChart = ({ tracks, updating }) => {
         .append("text")
         .attr("class", "last-played-artist")
         .attr("x", 0)
-        .attr("y", -20) // Position below the song name
+        .attr("y", -radius - 30) // Adjust this value to position it at the top
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .style("font-size", "12px")
+        .style("font-size", "14px")
         .style("font-family", "'Poppins', sans-serif")
         .style("font-weight", "bold")
         .text(
@@ -234,10 +328,10 @@ const TimelineChart = ({ tracks, updating }) => {
         .append("text")
         .attr("class", "last-played-time")
         .attr("x", 0)
-        .attr("y", -5) // Position below the artist name
+        .attr("y", -radius - 15) // Adjust this value to position it at the top
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .style("font-size", "12px")
+        .style("font-size", "14px")
         .style("font-family", "'Poppins', sans-serif")
         .style("font-weight", "bold")
         .text(formattedTime);
@@ -298,6 +392,29 @@ const TimelineChart = ({ tracks, updating }) => {
     const radius = Math.min(400, 400) / 2 - 20;
 
     drawClockHand(clockGroup, radius);
+
+    // Define yesterday
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+      .toISOString()
+      .slice(0, 10);
+
+    // Remove gray nodes if the current time is past or equal to their played time
+    const now = new Date();
+    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+    clockGroup.selectAll(".gray-point").each(function () {
+      const node = d3.select(this);
+      const trackDate = new Date(parseInt(node.attr("data-time")));
+      const trackDateStr = trackDate.toISOString().slice(0, 10);
+      const trackTimeInMinutes =
+        trackDate.getHours() * 60 + trackDate.getMinutes();
+
+      if (
+        trackDateStr === yesterday &&
+        currentTimeInMinutes >= trackTimeInMinutes
+      ) {
+        node.remove();
+      }
+    });
   };
 
   const formatTime = (date) => {
@@ -315,31 +432,31 @@ const TimelineChart = ({ tracks, updating }) => {
       style={{ flex: 1, padding: "10px" }}
     >
       {showUpdating && (
-        <Flex direction="column" align="center" mt={2}>
+        <Flex direction="column" align="center" mt={1}>
+          <Spinner size="xs" color="green.500" />
           <Text
             fontSize="18px"
             fontFamily="'Poppins', sans-serif"
             fontWeight="bold"
-            mb={1}
+            mb={5}
           >
             Updating...
           </Text>
-          <Spinner size="xs" color="green.500" />
         </Flex>
       )}
 
       {!showUpdating && (
-        <Flex direction="column" align="center" mt={2}>
+        <Flex direction="column" align="center" mt={1}>
+          <Spinner size="xs" color="transparent" />
           <Text
             fontSize="18px"
             fontFamily="'Poppins', sans-serif"
             fontWeight="bold"
             color="transparent"
-            mb={1}
+            mb={5}
           >
             Updating...
           </Text>
-          <Spinner size="xs" color="transparent" />
         </Flex>
       )}
       <svg

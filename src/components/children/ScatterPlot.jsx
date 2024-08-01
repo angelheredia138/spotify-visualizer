@@ -27,7 +27,6 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
         valence: track.audio_features.valence || 0,
       }));
 
-    console.log("Processed tracks for scatter plot:", processed);
     setProcessedTracks(processed);
   };
 

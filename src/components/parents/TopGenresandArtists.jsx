@@ -41,7 +41,6 @@ const TopGenresandArtists = () => {
         { headers }
       );
       const genresData = await genresResponse.json();
-      console.log("Fetched genres data:", genresData);
 
       // Fetch artists data
       const artistsResponse = await fetch(
@@ -49,7 +48,6 @@ const TopGenresandArtists = () => {
         { headers }
       );
       const artistsData = await artistsResponse.json();
-      console.log("Fetched artists data:", artistsData);
 
       // Create a map to collect artists for each genre
       const genreArtistsMap = new Map();
@@ -78,11 +76,8 @@ const TopGenresandArtists = () => {
           ? `Artists: ${allArtists.join(", ")}`
           : "No artists available";
 
-        console.log("Enriched genre object:", genre);
         return genre;
       });
-
-      console.log("Processed top genres data:", enrichedGenres);
 
       setTopGenres(enrichedGenres);
       setLeastGenres(genresData.least_genres || []);

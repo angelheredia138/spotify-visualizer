@@ -163,3 +163,10 @@ svg {
     margin: 10px;
   }
 }
+.chart-container-responsive {
+  overflow: auto;
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+}

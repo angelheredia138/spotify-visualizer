@@ -38,7 +38,6 @@ const RadarChart = ({ tracks }) => {
         valence: track.audio_features.valence || 0,
       }));
 
-    console.log("Processed tracks for radar chart:", processed);
     setProcessedTracks(processed);
   };
 

@@ -66,14 +66,13 @@ def top_tracks(request):
 
     return JsonResponse(response.json())
 
-
 @api_view(['GET'])
 def top_artists(request):
     token = get_spotify_access_token()
     if token is None:
         return JsonResponse({'error': 'Token not available'}, status=400)
 
-    time_range = request.GET.get('time_range', 'medium_term')
+    time_range = request.GET.get('time_range', 'short_term')
     url = f"https://api.spotify.com/v1/me/top/artists?time_range={time_range}&limit=10"
 
     headers = {'Authorization': f'Bearer {token}'}
@@ -112,6 +111,7 @@ def top_genres(request):
     least_genres = [genre for genre in genres_list if genre not in top_genres]
 
     return JsonResponse({'top_genres': top_genres, 'least_genres': least_genres})
+
 @api_view(['GET'])
 def recently_played(request):
     token = request.headers.get('Authorization').split(' ')[1]
@@ -143,3 +143,111 @@ def get_genres(request):
         return JsonResponse({'genres': genres_list})
     else:
         return JsonResponse({'error': 'Failed to fetch genres from Spotify'}, status=500)
+
+@api_view(['GET'])
+def get_playlists(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    url = "https://api.spotify.com/v1/me/playlists?limit=50"
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch playlists'}, status=response.status_code)
+
+    playlists = response.json().get('items', [])
+    playlist_data = []
+
+    for playlist in playlists:
+        playlist_id = playlist.get('id')
+        playlist_name = playlist.get('name')
+        tracks_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        tracks_response = requests.get(tracks_url, headers=headers)
+
+        if tracks_response.status_code == 200:
+            tracks = tracks_response.json().get('items', [])
+            artists = set()
+            for item in tracks:
+                track = item.get('track')
+                if track:
+                    for artist in track.get('artists', []):
+                        artists.add(artist.get('name'))
+
+            playlist_data.append({
+                'id': playlist_id,
+                'name': playlist_name,
+                'artists': list(artists)
+            })
+
+    return JsonResponse({'playlists': playlist_data})
+
+@api_view(['GET'])
+def top_songs(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    time_range = request.GET.get('time_range', 'medium_term')
+    url = f"https://api.spotify.com/v1/me/top/tracks?time_range={time_range}&limit=20"
+
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch top songs'}, status=response.status_code)
+
+    return JsonResponse(response.json())
+
+@api_view(['GET'])
+def listening_habits(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    url = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch recently played tracks'}, status=response.status_code)
+
+    recently_played = response.json().get('items', [])
+    listening_habits = {}
+    
+    for item in recently_played:
+        played_at = item.get('played_at')
+        track = item.get('track')
+        if played_at and track:
+            date = played_at.split('T')[0]
+            if date not in listening_habits:
+                listening_habits[date] = []
+            listening_habits[date].append(track)
+
+    return JsonResponse(listening_habits, safe=False)
+
+@api_view(['GET'])
+def listening_time(request):
+    token = get_spotify_access_token()
+    if token is None:
+        return JsonResponse({'error': 'Token not available'}, status=400)
+
+    url = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch recently played tracks'}, status=response.status_code)
+
+    recently_played = response.json().get('items', [])
+    time_distribution = [0] * 24
+    
+    for item in recently_played:
+        played_at = item.get('played_at')
+        if played_at:
+            hour = int(played_at.split('T')[1][:2])
+            time_distribution[hour] += 1
+
+    return JsonResponse(time_distribution, safe=False)

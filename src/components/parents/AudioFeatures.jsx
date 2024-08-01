@@ -50,8 +50,6 @@ const AudioFeatures = () => {
         if (tracksData.items.length < limit) break;
       }
 
-      console.log("Fetched tracks data:", fetchedTracks);
-
       const trackIds = fetchedTracks.map((track) => track.id).join(",");
 
       const audioFeaturesResponse = await fetch(
@@ -59,8 +57,6 @@ const AudioFeatures = () => {
         { headers }
       );
       const audioFeaturesData = await audioFeaturesResponse.json();
-
-      console.log("Fetched audio features data:", audioFeaturesData);
 
       const tracksWithAudioFeatures = fetchedTracks.map((track) => {
         const audioFeatures = audioFeaturesData.audio_features.find(
