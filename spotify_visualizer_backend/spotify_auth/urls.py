@@ -8,9 +8,8 @@ from .views import (
     recently_played,
     get_genres,
     get_playlists,
-    top_songs,
-    listening_habits,
-    listening_time
+    get_wrapped_data,
+    
 )
 
 urlpatterns = [
@@ -22,7 +21,5 @@ urlpatterns = [
     path('recently-played/', recently_played),
     path('genres/', get_genres, name='get_genres'),
     path('playlists/', get_playlists, name='get_playlists'),
-    path('top-songs/', top_songs, name='top_songs'),
-    path('listening-habits/', listening_habits, name='listening_habits'),
-    path('listening-time/', listening_time, name='listening_time'),
+    path('wrapped/', get_wrapped_data, name='get_wrapped_data'),
 ]
