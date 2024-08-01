@@ -8,6 +8,7 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
   let isHovering = false;
   let hoverTimeout = null;
   let clickTimeout = null;
+
   useEffect(() => {
     if (tracks.length > 0) {
       preprocessTracks(tracks);
@@ -119,8 +120,9 @@ const ScatterPlot = ({ tracks, timeRange, setTimeRange }) => {
         const circle = d3.select(this);
         const isHighlighted = circle.classed("highlighted");
 
-        // Remove highlight from all circles
-        d3.selectAll("circle")
+        // Remove highlight from all circles within the scatter plot
+        chart
+          .selectAll("circle")
           .classed("highlighted", false)
           .style("fill", "steelblue");
 

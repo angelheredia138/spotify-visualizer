@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import spotify_auth, spotify_callback, top_genres, top_tracks, top_artists, recently_played
+from .views import spotify_auth, spotify_callback, top_genres, top_tracks, top_artists, recently_played, get_genres
 
 urlpatterns = [
     path('spotify-auth/', spotify_auth),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('top-artists/', top_artists),
     path('top-genres/', top_genres),
     path('recently-played/', recently_played),
+    path('genres/', get_genres, name='get_genres'),
 ]

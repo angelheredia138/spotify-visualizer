@@ -124,3 +124,22 @@ def recently_played(request):
         return JsonResponse(response.json(), safe=False)
     else:
         return JsonResponse({'error': 'Failed to fetch data'}, status=response.status_code)
+
+@api_view(['GET'])
+def get_genres(request):
+    token = request.headers.get('Authorization').split(' ')[1]  # Extract the token from the Authorization header
+    url = "https://api.spotify.com/v1/me/top/artists"
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        genres = [genre for artist in data['items'] for genre in artist['genres']]
+        genre_counts = {genre: genres.count(genre) for genre in set(genres)}
+        sorted_genres = sorted(genre_counts.items(), key=lambda x: x[1], reverse=True)
+        genres_list = [{'genre': genre, 'count': count} for genre, count in sorted_genres]
+        return JsonResponse({'genres': genres_list})
+    else:
+        return JsonResponse({'error': 'Failed to fetch genres from Spotify'}, status=500)

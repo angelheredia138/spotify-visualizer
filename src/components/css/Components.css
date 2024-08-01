@@ -43,6 +43,11 @@ body {
   align-items: center;
   text-align: center;
 }
+svg text {
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  paint-order: stroke;
+}
 .chart-container-transparent {
   padding: 20px;
   border-radius: 10px;
