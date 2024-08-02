@@ -14,7 +14,9 @@ const Callback = () => {
     if (code && !processing.current) {
       processing.current = true; // Set the ref to true to indicate processing has started
 
-      fetch(`http://localhost:8000/api/spotify-callback/?code=${code}`)
+      fetch(
+        `https://spotify-visualizer-backend.vercel.app/api/spotify-callback/?code=${code}`
+      )
         .then((response) => response.json())
         .then((data) => {
           if (data.access_token) {

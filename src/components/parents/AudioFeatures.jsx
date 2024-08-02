@@ -40,7 +40,7 @@ const AudioFeatures = () => {
       while (fetchedTracks.length < 100) {
         // Adjust the loop to fetch 100 tracks
         const tracksResponse = await fetch(
-          `http://localhost:8000/api/top-tracks/?time_range=${timeRange}&limit=${limit}&offset=${offset}`,
+          `https://spotify-visualizer-backend.vercel.app/api/top-tracks/?time_range=${timeRange}&limit=${limit}&offset=${offset}`,
           { headers }
         );
         const tracksData = await tracksResponse.json();

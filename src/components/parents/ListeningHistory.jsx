@@ -30,7 +30,7 @@ const ListeningHistory = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const response = await fetch(
-        `http://localhost:8000/api/recently-played/`,
+        `https://spotify-visualizer-backend.vercel.app/api/recently-played/`,
         { headers }
       );
       const text = await response.text();

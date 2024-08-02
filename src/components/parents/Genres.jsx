@@ -30,9 +30,12 @@ const Genres = () => {
       const token = localStorage.getItem("spotify_access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await fetch(`http://localhost:8000/api/genres/`, {
-        headers,
-      });
+      const response = await fetch(
+        `https://spotify-visualizer-backend.vercel.app/api/genres/`,
+        {
+          headers,
+        }
+      );
       const data = await response.json();
       setGenres(data.genres || []);
       setLoading(false);
