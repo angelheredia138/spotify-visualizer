@@ -21,23 +21,20 @@ const Summary = ({ scrollToNext }) => {
       };
 
       const fetchListeningTime = fetch(
-        "https://spotify-visualizer-backend.vercel.app/api/total_listening_time",
+        "http://127.0.0.1:8000/api/total_listening_time",
         { headers }
       );
       const fetchUniqueGenres = fetch(
-        "https://spotify-visualizer-backend.vercel.app/api/unique_genres",
+        "http://127.0.0.1:8000/api/unique_genres",
         { headers }
       );
       const fetchUniqueArtists = fetch(
-        "https://spotify-visualizer-backend.vercel.app/api/unique_artists",
+        "http://127.0.0.1:8000/api/unique_artists",
         { headers }
       );
-      const fetchTrends = fetch(
-        "https://spotify-visualizer-backend.vercel.app/api/trends_insights",
-        {
-          headers,
-        }
-      );
+      const fetchTrends = fetch("http://127.0.0.1:8000/api/trends_insights", {
+        headers,
+      });
 
       const [listeningTimeRes, uniqueGenresRes, uniqueArtistsRes, trendsRes] =
         await Promise.all([

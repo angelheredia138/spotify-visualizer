@@ -38,14 +38,14 @@ const TopGenresandArtists = () => {
 
       // Fetch genres data
       const genresResponse = await fetch(
-        `https://spotify-visualizer-backend.vercel.app/api/top-genres/?time_range=${timeRange}`,
+        `http://127.0.0.1:8000/api/top-genres/?time_range=${timeRange}`,
         { headers }
       );
       const genresData = await genresResponse.json();
 
       // Fetch artists data
       const artistsResponse = await fetch(
-        `https://spotify-visualizer-backend.vercel.app/api/top-artists/?time_range=${timeRange}`,
+        `http://127.0.0.1:8000/api/top-artists/?time_range=${timeRange}`,
         { headers }
       );
       const artistsData = await artistsResponse.json();

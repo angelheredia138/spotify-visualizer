@@ -1,12 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
-import App from "./App";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
 import "./index.css";
 
-ReactDOM.render(
-  <Router basename={"/spotify-visualizer/"}>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <App />
-  </Router>,
-  document.getElementById("root")
+  </React.StrictMode>
 );

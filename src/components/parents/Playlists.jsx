@@ -28,12 +28,9 @@ const Playlists = () => {
       const token = localStorage.getItem("spotify_access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await fetch(
-        `https://spotify-visualizer-backend.vercel.app/api/playlists/`,
-        {
-          headers,
-        }
-      );
+      const response = await fetch(`http://127.0.0.1:8000/api/playlists/`, {
+        headers,
+      });
       const data = await response.json();
 
       setPlaylists(data.playlists || []);
