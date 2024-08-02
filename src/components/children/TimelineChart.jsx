@@ -13,7 +13,7 @@ const TimelineChart = ({ tracks, updating }) => {
     if (tracks.length > 0) {
       drawClockTimelineChart(tracks);
       const interval = setInterval(() => {
-        updateClockHand();
+        updateClockHandAndNodes();
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -91,24 +91,11 @@ const TimelineChart = ({ tracks, updating }) => {
       .style("pointer-events", "none")
       .style("display", "none");
 
-    // Filter tracks to include those played today and yesterday
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
-      .toISOString()
-      .slice(0, 10);
-    const todayTracks = tracks.filter((track) =>
-      track.played_at.startsWith(today)
-    );
-    const yesterdayTracks = tracks.filter((track) =>
-      track.played_at.startsWith(yesterday)
-    );
-
     const now = new Date();
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
 
     // Draw data points for today and yesterday
-    const allTracks = [...yesterdayTracks, ...todayTracks];
-    allTracks.forEach((track, index) => {
+    tracks.forEach((track, index) => {
       const date = new Date(track.played_at);
       const hours = date.getHours() + date.getMinutes() / 60;
       const angle = (hours / 24) * 2 * Math.PI;
@@ -117,27 +104,25 @@ const TimelineChart = ({ tracks, updating }) => {
       const x = Math.cos(angle - Math.PI / 2 + offset) * (radius - 10); // Move points closer to the border
       const y = Math.sin(angle - Math.PI / 2 + offset) * (radius - 10);
 
-      const isToday = track.played_at.startsWith(today);
-      const isYesterday = track.played_at.startsWith(yesterday);
-      const pointColor = isToday ? d3.schemeCategory10[index % 10] : "gray";
+      const isYesterday = date < now && currentTimeInMinutes < hours * 60;
 
-      clockGroup
+      const node = clockGroup
         .append("circle")
         .attr("cx", x)
         .attr("cy", y)
         .attr("r", 4) // Smaller radius for the points
-        .style("fill", pointColor)
+        .style("fill", isYesterday ? "gray" : d3.schemeCategory10[index % 10])
         .style("opacity", 0.7) // Make the points slightly opaque
         .attr("data-time", date.getTime()) // Store the time in milliseconds
         .attr("data-date", track.played_at.slice(0, 10)) // Store the date in yyyy-mm-dd format
         .attr("data-index", index) // Store the index for coloring
-        .attr("data-day", isToday ? "today" : "yesterday") // Store day information
+        .attr("data-day", isYesterday ? "yesterday" : "today") // Store day information
         .on("mouseover", function (event) {
           setIsHovering(true);
           clearTimeout(hoverTimeout);
           d3.select(this).transition().attr("r", 6); // Enlarge the point on hover
           const formattedTime = formatTime(date);
-          const dayInfo = isToday ? "Today" : "Yesterday";
+          const dayInfo = isYesterday ? "Yesterday" : "Today";
           tooltip
             .style("display", "block")
             .html(
@@ -148,8 +133,6 @@ const TimelineChart = ({ tracks, updating }) => {
                 .join(", ")}<br/>${dayInfo}`
             );
           d3.select(this).style("stroke", "#000").style("stroke-width", "2px");
-
-          // Log all attributes to console
 
           setHoverTimeout(
             setTimeout(() => {
@@ -173,7 +156,7 @@ const TimelineChart = ({ tracks, updating }) => {
           if (isHovering) return;
           d3.select(this).transition().attr("r", 6); // Enlarge the point on click
           const formattedTime = formatTime(date);
-          const dayInfo = isToday ? "Today" : "Yesterday";
+          const dayInfo = isYesterday ? "Yesterday" : "Today";
           tooltip
             .style("display", "block")
             .html(
@@ -200,6 +183,11 @@ const TimelineChart = ({ tracks, updating }) => {
     drawClockHand(clockGroup, radius);
 
     // Display the last played song above the center
+    const todayTracks = tracks.filter((track) => {
+      const date = new Date(track.played_at);
+      return date >= new Date().setHours(0, 0, 0, 0);
+    });
+
     if (todayTracks.length > 0) {
       const lastPlayedTrack = todayTracks[0];
       const lastPlayedTime = new Date(lastPlayedTrack.played_at);
@@ -306,7 +294,7 @@ const TimelineChart = ({ tracks, updating }) => {
       .attr("fill", "red");
   };
 
-  const updateClockHand = () => {
+  const updateClockHandAndNodes = () => {
     const svg = d3.select("#d3-clock-timeline-chart");
     const clockGroup = svg.select("g");
     const radius = Math.min(400, 400) / 2 - 20;
@@ -315,26 +303,22 @@ const TimelineChart = ({ tracks, updating }) => {
 
     const now = new Date();
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
-      .toISOString()
-      .slice(0, 10);
 
-    // Check and update all nodes based on their date attribute
+    // Check and update all nodes based on their time attribute
     clockGroup.selectAll("circle").each(function () {
       const node = d3.select(this);
-      const nodeDate = node.attr("data-date");
       const trackDate = new Date(parseInt(node.attr("data-time")));
       const trackTimeInMinutes =
         trackDate.getHours() * 60 + trackDate.getMinutes();
-      const isToday = nodeDate === today;
-      const isYesterday = nodeDate === yesterday;
 
-      if (isYesterday && currentTimeInMinutes >= trackTimeInMinutes) {
+      if (
+        node.attr("data-day") === "yesterday" &&
+        currentTimeInMinutes >= trackTimeInMinutes
+      ) {
         node.remove();
-      } else if (isYesterday) {
+      } else if (node.attr("data-day") === "yesterday") {
         node.style("fill", "gray");
-      } else if (isToday) {
+      } else {
         node.style(
           "fill",
           d3.schemeCategory10[parseInt(node.attr("data-index")) % 10]
