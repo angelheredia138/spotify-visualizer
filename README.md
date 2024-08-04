@@ -1,6 +1,8 @@
 # Spotify Visualizer
 
-Welcome to the Spotify Visualizer! This website offers an interactive and visually engaging way to explore your Spotify listening habits. Dive into detailed analyses and visualizations of your top genres, artists, tracks, and more.
+Welcome to the Spotify Visualizer! This website offers an interactive and visually engaging way to explore your Spotify listening habits. Dive into detailed analyses and visualizations of your top genres, artists, tracks, and more. (I am probably not going to update this repo, but keeping it public for the time being, I have a seperate repo for the frontend for GitHub pages, and a private one with the current iteration of the backend) 
+
+If you would like to try this visualizer out for yourself, go to https://angel-heredia.com/spotify-visualizer-frontend/
 
 ## Features
 
